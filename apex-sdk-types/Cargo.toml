@@ -1,0 +1,12 @@
+[package]
+name = "apex-sdk-types"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Common types for Apex SDK"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }
