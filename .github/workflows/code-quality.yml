@@ -31,7 +31,7 @@ jobs:
         run: cargo install --locked cargo-geiger
 
       - name: Check for unsafe code
-        run: cargo geiger --output-format GitHubMarkdown >> $GITHUB_STEP_SUMMARY
+        run: cargo geiger --all-targets --output-format GitHubMarkdown >> $GITHUB_STEP_SUMMARY
 
   # Dead code detection
   dead-code:

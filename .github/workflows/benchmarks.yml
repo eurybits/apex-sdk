@@ -98,10 +98,16 @@ jobs:
       - name: Run benchmarks on PR
         run: cargo bench --all-features -- --output-format bencher | tee pr-output.txt
 
+      - name: Save PR benchmark results
+        run: cp pr-output.txt /tmp/pr-output.txt
+
       - name: Checkout base branch
         uses: actions/checkout@v5
         with:
           ref: ${{ github.base_ref }}
+
+      - name: Restore PR benchmark results
+        run: cp /tmp/pr-output.txt pr-output.txt
 
       - name: Run benchmarks on base
         run: cargo bench --all-features -- --output-format bencher | tee base-output.txt
