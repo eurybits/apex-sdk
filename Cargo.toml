@@ -1,0 +1,62 @@
+[workspace]
+members = [
+    "apex-sdk",
+    "apex-sdk-core",
+    "apex-sdk-substrate",
+    "apex-sdk-evm",
+    "apex-sdk-types",
+    "cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+description = "Unified Rust SDK for Substrate & EVM Blockchain Development"
+authors = ["Khalid Hussein <kherld.hussein@gmail.com>"]
+rust-version = "1.75"
+license = "Apache-2.0"
+repository = "https://github.com/kherldhussein/apex-sdk"
+homepage = "https://github.com/kherldhussein/apex-sdk"
+keywords = ["blockchain", "substrate", "evm", "sdk", "development"]
+documentation = "https://apexsdk/kherldhussein.github.io/apex-sdk/"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "2.0.17"
+
+# Substrate dependencies
+subxt = "0.44.0"
+sp-core = "38.1.0"
+sp-runtime = "44.0.0"
+
+# EVM dependencies
+ethers = "2.0"
+alloy-primitives = "1.4.1"
+
+# Utilities
+hex = "0.4"
+bs58 = "0.5"
+url = "2.5"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# Internal workspace dependencies
+apex-sdk-core = { path = "apex-sdk-core" }
+apex-sdk-substrate = { path = "apex-sdk-substrate" }
+apex-sdk-evm = { path = "apex-sdk-evm" }
+apex-sdk-types = { path = "apex-sdk-types" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
