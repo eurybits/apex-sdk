@@ -297,7 +297,7 @@ pub struct ContractInfo<'a> {
     adapter: &'a EvmAdapter,
 }
 
-impl<'a> ContractInfo<'a> {
+impl ContractInfo<'_> {
     /// Get the contract address
     pub fn address(&self) -> &str {
         &self.address
