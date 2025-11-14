@@ -21,10 +21,6 @@ ignore = [
     # Mitigation: Migration to Alloy scheduled
     "RUSTSEC-2025-0010",
 
-    # derivative crate unmaintained via ark-ff -> ruint -> alloy-primitives
-    # Compile-time only derive macro crate, no runtime security implications
-    "RUSTSEC-2024-0388",
-
     # fxhash unmaintained via hashers -> ethers-providers
     # Internal optimization in ethers, no known vulnerabilities
     # Will be resolved with Alloy migration
@@ -34,10 +30,6 @@ ignore = [
     # Time measurement utility, no security vulnerabilities
     # Will be resolved with migration to Alloy
     "RUSTSEC-2024-0384",
-
-    # paste crate unmaintained via ark-ff and alloy-primitives
-    # Compile-time procedural macro crate only, no runtime implications
-    "RUSTSEC-2024-0436",
 ]
 
 [licenses]
@@ -52,10 +44,20 @@ allow = [
     "BSD-3-Clause",
     "ISC",
     "Unicode-3.0",
-    "Unicode-DFS-2016",
+    "Unlicense",
+    "0BSD",
+    "Zlib",
+    "CC0-1.0",
 ]
 # The confidence threshold for detecting a license from license text
 confidence-threshold = 0.8
+
+# Allow specific crates with LGPL that are used only at build time or are essential
+[[licenses.exceptions]]
+allow = ["LGPL-2.1-or-later"]
+name = "r-efi"
+version = "*"
+reason = "Used only for UEFI abstractions, not linked in final binary"
 
 [licenses.private]
 # If true, ignores workspace crates that aren't published
