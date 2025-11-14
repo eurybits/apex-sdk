@@ -9,7 +9,10 @@
 use crate::Error;
 use ethers::prelude::*;
 use ethers::signers::{coins_bip39::English, LocalWallet, Signer};
-use ethers::types::{transaction::eip2718::TypedTransaction, transaction::eip712::Eip712, Address as EthAddress, Signature};
+use ethers::types::{
+    transaction::eip2718::TypedTransaction, transaction::eip712::Eip712, Address as EthAddress,
+    Signature,
+};
 use std::str::FromStr;
 
 /// Wallet for managing EVM accounts and signing transactions
@@ -91,7 +94,11 @@ impl Wallet {
 
         let address = wallet.address();
 
-        tracing::info!("Loaded wallet from mnemonic at index {}: {}", index, address);
+        tracing::info!(
+            "Loaded wallet from mnemonic at index {}: {}",
+            index,
+            address
+        );
 
         Ok(Self {
             inner: wallet,
@@ -126,7 +133,8 @@ impl Wallet {
     /// # Returns
     /// The signature as bytes
     pub async fn sign_transaction(&self, tx: &TypedTransaction) -> Result<Signature, Error> {
-        let signature = self.inner
+        let signature = self
+            .inner
             .sign_transaction(tx)
             .await
             .map_err(|e| Error::Transaction(format!("Failed to sign transaction: {}", e)))?;
@@ -143,8 +151,12 @@ impl Wallet {
     ///
     /// # Returns
     /// The signature as bytes
-    pub async fn sign_message<S: AsRef<[u8]> + Send + Sync>(&self, message: S) -> Result<Signature, Error> {
-        let signature = self.inner
+    pub async fn sign_message<S: AsRef<[u8]> + Send + Sync>(
+        &self,
+        message: S,
+    ) -> Result<Signature, Error> {
+        let signature = self
+            .inner
             .sign_message(message)
             .await
             .map_err(|e| Error::Transaction(format!("Failed to sign message: {}", e)))?;
@@ -165,7 +177,8 @@ impl Wallet {
         &self,
         data: &T,
     ) -> Result<Signature, Error> {
-        let signature = self.inner
+        let signature = self
+            .inner
             .sign_typed_data(data)
             .await
             .map_err(|e| Error::Transaction(format!("Failed to sign typed data: {}", e)))?;

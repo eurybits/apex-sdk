@@ -351,7 +351,11 @@ mod tests {
 
         // Set a value
         cache
-            .set("key1".to_string(), "value1".to_string(), Duration::from_secs(60))
+            .set(
+                "key1".to_string(),
+                "value1".to_string(),
+                Duration::from_secs(60),
+            )
             .await;
 
         // Get the value
@@ -393,15 +397,27 @@ mod tests {
 
         // Fill cache to capacity
         cache
-            .set("key1".to_string(), "value1".to_string(), Duration::from_secs(60))
+            .set(
+                "key1".to_string(),
+                "value1".to_string(),
+                Duration::from_secs(60),
+            )
             .await;
         cache
-            .set("key2".to_string(), "value2".to_string(), Duration::from_secs(60))
+            .set(
+                "key2".to_string(),
+                "value2".to_string(),
+                Duration::from_secs(60),
+            )
             .await;
 
         // Add one more, should evict oldest
         cache
-            .set("key3".to_string(), "value3".to_string(), Duration::from_secs(60))
+            .set(
+                "key3".to_string(),
+                "value3".to_string(),
+                Duration::from_secs(60),
+            )
             .await;
 
         let stats = cache.stats().await;
@@ -413,7 +429,9 @@ mod tests {
         let cache = EvmCache::new();
 
         // Test balance cache
-        cache.set_balance("0x123", "1000000000000000000".to_string()).await;
+        cache
+            .set_balance("0x123", "1000000000000000000".to_string())
+            .await;
         let balance = cache.get_balance("0x123").await;
         assert_eq!(balance, Some("1000000000000000000".to_string()));
 

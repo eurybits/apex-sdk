@@ -166,7 +166,8 @@ impl TransactionExecutor {
             (estimated_gas.as_u128() as f64 * self.gas_config.gas_limit_multiplier) as u128,
         );
 
-        tracing::debug!("Estimated gas limit: {} (with {}% buffer)",
+        tracing::debug!(
+            "Estimated gas limit: {} (with {}% buffer)",
             gas_limit,
             (self.gas_config.gas_limit_multiplier - 1.0) * 100.0
         );
@@ -408,7 +409,8 @@ impl TransactionExecutor {
 
                     // Add jitter if configured
                     let delay = if self.retry_config.use_jitter {
-                        let jitter = (rand::random::<f64>() * 0.3 + 0.85) * backoff.as_millis() as f64;
+                        let jitter =
+                            (rand::random::<f64>() * 0.3 + 0.85) * backoff.as_millis() as f64;
                         Duration::from_millis(jitter as u64)
                     } else {
                         backoff
@@ -448,14 +450,18 @@ impl TransactionExecutor {
                 let pending = p
                     .send_raw_transaction(signed_tx.clone())
                     .await
-                    .map_err(|e| Error::Transaction(format!("Failed to send transaction: {}", e)))?;
+                    .map_err(|e| {
+                        Error::Transaction(format!("Failed to send transaction: {}", e))
+                    })?;
                 *pending
             }
             ProviderType::Ws(p) => {
                 let pending = p
                     .send_raw_transaction(signed_tx.clone())
                     .await
-                    .map_err(|e| Error::Transaction(format!("Failed to send transaction: {}", e)))?;
+                    .map_err(|e| {
+                        Error::Transaction(format!("Failed to send transaction: {}", e))
+                    })?;
                 *pending
             }
         };
@@ -506,7 +512,10 @@ fn format_gwei(wei: U256) -> String {
 
     // Convert to string and trim trailing zeros for readability
     let formatted = format!("{}.{:09}", gwei_whole, remainder);
-    formatted.trim_end_matches('0').trim_end_matches('.').to_string()
+    formatted
+        .trim_end_matches('0')
+        .trim_end_matches('.')
+        .to_string()
 }
 
 /// Helper function to format wei to ETH
@@ -517,7 +526,10 @@ fn format_eth(wei: U256) -> String {
 
     // Convert to string and trim trailing zeros for readability
     let formatted = format!("{}.{:018}", eth_whole, remainder);
-    formatted.trim_end_matches('0').trim_end_matches('.').to_string()
+    formatted
+        .trim_end_matches('0')
+        .trim_end_matches('.')
+        .to_string()
 }
 
 #[cfg(test)]

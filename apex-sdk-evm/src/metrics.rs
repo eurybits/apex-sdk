@@ -36,14 +36,16 @@ impl RpcMetrics {
     pub fn record_success(&self, latency_ms: u64) {
         self.total_calls.fetch_add(1, Ordering::Relaxed);
         self.successful_calls.fetch_add(1, Ordering::Relaxed);
-        self.total_latency_ms.fetch_add(latency_ms, Ordering::Relaxed);
+        self.total_latency_ms
+            .fetch_add(latency_ms, Ordering::Relaxed);
     }
 
     /// Record a failed RPC call
     pub fn record_failure(&self, latency_ms: u64) {
         self.total_calls.fetch_add(1, Ordering::Relaxed);
         self.failed_calls.fetch_add(1, Ordering::Relaxed);
-        self.total_latency_ms.fetch_add(latency_ms, Ordering::Relaxed);
+        self.total_latency_ms
+            .fetch_add(latency_ms, Ordering::Relaxed);
     }
 
     /// Record a retry
@@ -118,7 +120,8 @@ impl TransactionMetrics {
 
     /// Get success rate as percentage
     pub fn success_rate(&self) -> f64 {
-        let completed = self.successful.load(Ordering::Relaxed) + self.failed.load(Ordering::Relaxed);
+        let completed =
+            self.successful.load(Ordering::Relaxed) + self.failed.load(Ordering::Relaxed);
         if completed == 0 {
             return 100.0;
         }
@@ -277,11 +280,17 @@ impl MetricsCollector {
 
         output.push_str("# HELP apex_evm_rpc_latency_avg Average RPC latency in milliseconds\n");
         output.push_str("# TYPE apex_evm_rpc_latency_avg gauge\n");
-        output.push_str(&format!("apex_evm_rpc_latency_avg {}\n", self.rpc.avg_latency_ms()));
+        output.push_str(&format!(
+            "apex_evm_rpc_latency_avg {}\n",
+            self.rpc.avg_latency_ms()
+        ));
 
         output.push_str("# HELP apex_evm_rpc_success_rate RPC success rate percentage\n");
         output.push_str("# TYPE apex_evm_rpc_success_rate gauge\n");
-        output.push_str(&format!("apex_evm_rpc_success_rate {}\n", self.rpc.success_rate()));
+        output.push_str(&format!(
+            "apex_evm_rpc_success_rate {}\n",
+            self.rpc.success_rate()
+        ));
 
         // Transaction metrics
         output.push_str("# HELP apex_evm_transactions_submitted Total transactions submitted\n");
@@ -358,7 +367,10 @@ impl MetricsCollector {
             "  Successful: {}",
             self.rpc.successful_calls.load(Ordering::Relaxed)
         );
-        println!("  Failed: {}", self.rpc.failed_calls.load(Ordering::Relaxed));
+        println!(
+            "  Failed: {}",
+            self.rpc.failed_calls.load(Ordering::Relaxed)
+        );
         println!("  Success Rate: {:.2}%", self.rpc.success_rate());
         println!("  Avg Latency: {:.2}ms", self.rpc.avg_latency_ms());
         println!("  Retries: {}", self.rpc.retries.load(Ordering::Relaxed));

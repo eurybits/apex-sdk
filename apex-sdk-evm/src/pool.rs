@@ -9,8 +9,8 @@
 use crate::{Error, EvmAdapter};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
-use tokio::sync::RwLock;
 use std::time::{Duration, Instant};
+use tokio::sync::RwLock;
 
 /// Health status of an endpoint
 #[derive(Debug, Clone)]
@@ -73,8 +73,7 @@ impl PooledConnection {
         if health.avg_response_time_ms == 0 {
             health.avg_response_time_ms = response_time_ms;
         } else {
-            health.avg_response_time_ms =
-                (health.avg_response_time_ms * 9 + response_time_ms) / 10;
+            health.avg_response_time_ms = (health.avg_response_time_ms * 9 + response_time_ms) / 10;
         }
     }
 
@@ -139,7 +138,10 @@ impl ConnectionPool {
             return Err(Error::Connection("No endpoints provided".to_string()));
         }
 
-        tracing::info!("Creating connection pool with {} endpoints", endpoints.len());
+        tracing::info!(
+            "Creating connection pool with {} endpoints",
+            endpoints.len()
+        );
 
         let mut connections = Vec::new();
 
@@ -292,10 +294,7 @@ impl ConnectionPool {
             }
         });
 
-        tracing::info!(
-            "Started health checker with interval: {}s",
-            interval_secs
-        );
+        tracing::info!("Started health checker with interval: {}s", interval_secs);
     }
 
     /// Get the number of endpoints

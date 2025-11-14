@@ -1,17 +1,17 @@
 //! EVM blockchain adapter
 
-pub mod wallet;
-pub mod transaction;
-pub mod pool;
 pub mod cache;
 pub mod metrics;
+pub mod pool;
+pub mod transaction;
+pub mod wallet;
 
 use apex_sdk_types::{Address, TransactionStatus};
 use async_trait::async_trait;
 use thiserror::Error;
 
-use ethers::providers::{Provider, Http, Ws, Middleware};
-use ethers::types::{TransactionReceipt, H256, U256, Address as EthAddress};
+use ethers::providers::{Http, Middleware, Provider, Ws};
+use ethers::types::{Address as EthAddress, TransactionReceipt, H256, U256};
 use std::sync::Arc;
 
 /// EVM adapter error
@@ -44,47 +44,77 @@ impl ProviderType {
     /// Get the underlying provider as a middleware reference
     async fn get_block_number(&self) -> Result<U256, Error> {
         match self {
-            ProviderType::Http(p) => p.get_block_number().await
+            ProviderType::Http(p) => p
+                .get_block_number()
+                .await
                 .map_err(|e| Error::Connection(format!("Failed to get block number: {}", e)))
                 .map(|n| U256::from(n.as_u64())),
-            ProviderType::Ws(p) => p.get_block_number().await
+            ProviderType::Ws(p) => p
+                .get_block_number()
+                .await
                 .map_err(|e| Error::Connection(format!("Failed to get block number: {}", e)))
                 .map(|n| U256::from(n.as_u64())),
         }
     }
 
-    async fn get_transaction_receipt(&self, hash: H256) -> Result<Option<TransactionReceipt>, Error> {
+    async fn get_transaction_receipt(
+        &self,
+        hash: H256,
+    ) -> Result<Option<TransactionReceipt>, Error> {
         match self {
-            ProviderType::Http(p) => p.get_transaction_receipt(hash).await
+            ProviderType::Http(p) => p
+                .get_transaction_receipt(hash)
+                .await
                 .map_err(|e| Error::Transaction(format!("Failed to get receipt: {}", e))),
-            ProviderType::Ws(p) => p.get_transaction_receipt(hash).await
+            ProviderType::Ws(p) => p
+                .get_transaction_receipt(hash)
+                .await
                 .map_err(|e| Error::Transaction(format!("Failed to get receipt: {}", e))),
         }
     }
 
-    async fn get_transaction(&self, hash: H256) -> Result<Option<ethers::types::Transaction>, Error> {
+    async fn get_transaction(
+        &self,
+        hash: H256,
+    ) -> Result<Option<ethers::types::Transaction>, Error> {
         match self {
-            ProviderType::Http(p) => p.get_transaction(hash).await
+            ProviderType::Http(p) => p
+                .get_transaction(hash)
+                .await
                 .map_err(|e| Error::Transaction(format!("Failed to get transaction: {}", e))),
-            ProviderType::Ws(p) => p.get_transaction(hash).await
+            ProviderType::Ws(p) => p
+                .get_transaction(hash)
+                .await
                 .map_err(|e| Error::Transaction(format!("Failed to get transaction: {}", e))),
         }
     }
 
-    async fn get_balance(&self, address: EthAddress, block: Option<ethers::types::BlockId>) -> Result<U256, Error> {
+    async fn get_balance(
+        &self,
+        address: EthAddress,
+        block: Option<ethers::types::BlockId>,
+    ) -> Result<U256, Error> {
         match self {
-            ProviderType::Http(p) => p.get_balance(address, block).await
+            ProviderType::Http(p) => p
+                .get_balance(address, block)
+                .await
                 .map_err(|e| Error::Connection(format!("Failed to get balance: {}", e))),
-            ProviderType::Ws(p) => p.get_balance(address, block).await
+            ProviderType::Ws(p) => p
+                .get_balance(address, block)
+                .await
                 .map_err(|e| Error::Connection(format!("Failed to get balance: {}", e))),
         }
     }
 
     async fn get_chain_id(&self) -> Result<U256, Error> {
         match self {
-            ProviderType::Http(p) => p.get_chainid().await
+            ProviderType::Http(p) => p
+                .get_chainid()
+                .await
                 .map_err(|e| Error::Connection(format!("Failed to get chain ID: {}", e))),
-            ProviderType::Ws(p) => p.get_chainid().await
+            ProviderType::Ws(p) => p
+                .get_chainid()
+                .await
                 .map_err(|e| Error::Connection(format!("Failed to get chain ID: {}", e))),
         }
     }
@@ -125,7 +155,8 @@ impl EvmAdapter {
         let provider = if endpoint.starts_with("ws://") || endpoint.starts_with("wss://") {
             // WebSocket connection for real-time updates
             tracing::debug!("Using WebSocket connection");
-            let ws = Ws::connect(endpoint).await
+            let ws = Ws::connect(endpoint)
+                .await
                 .map_err(|e| Error::Connection(format!("WebSocket connection failed: {}", e)))?;
             ProviderType::Ws(Arc::new(Provider::new(ws)))
         } else {
@@ -162,7 +193,8 @@ impl EvmAdapter {
         }
 
         // Parse transaction hash
-        let hash: H256 = tx_hash.parse()
+        let hash: H256 = tx_hash
+            .parse()
             .map_err(|e| Error::Transaction(format!("Invalid hash format: {}", e)))?;
 
         // Query transaction receipt
@@ -208,7 +240,8 @@ impl EvmAdapter {
         tracing::debug!("Getting balance for address: {}", address);
 
         // Parse address
-        let addr: EthAddress = address.parse()
+        let addr: EthAddress = address
+            .parse()
             .map_err(|e| Error::InvalidAddress(format!("Invalid address format: {}", e)))?;
 
         // Query balance at latest block
@@ -302,7 +335,9 @@ mod tests {
     #[tokio::test]
     #[ignore] // Requires network connection
     async fn test_address_validation() {
-        let adapter = EvmAdapter::connect("https://eth.llamarpc.com").await.unwrap();
+        let adapter = EvmAdapter::connect("https://eth.llamarpc.com")
+            .await
+            .unwrap();
 
         let valid_addr = Address::evm("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7");
         assert!(adapter.validate_address(&valid_addr));
@@ -317,7 +352,9 @@ mod tests {
     #[tokio::test]
     #[ignore] // Requires network connection
     async fn test_transaction_status() {
-        let adapter = EvmAdapter::connect("https://eth.llamarpc.com").await.unwrap();
+        let adapter = EvmAdapter::connect("https://eth.llamarpc.com")
+            .await
+            .unwrap();
 
         // Test with a known transaction hash (first ETH transaction ever)
         let result = adapter

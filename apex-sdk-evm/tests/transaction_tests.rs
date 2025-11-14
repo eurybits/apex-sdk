@@ -322,7 +322,10 @@ fn test_metrics_rpc() {
     collector.rpc.record_failure(150);
 
     assert_eq!(
-        collector.rpc.total_calls.load(std::sync::atomic::Ordering::Relaxed),
+        collector
+            .rpc
+            .total_calls
+            .load(std::sync::atomic::Ordering::Relaxed),
         3
     );
     assert!((collector.rpc.success_rate() - 66.67).abs() < 0.1);
@@ -407,7 +410,11 @@ async fn test_full_workflow_with_all_features() {
 
     println!("\n=== Full Workflow Test ===");
     println!("Wallet: {}", wallet.address());
-    println!("Gas estimate: {} @ {} gwei", estimate.gas_limit, estimate.gas_price_gwei());
+    println!(
+        "Gas estimate: {} @ {} gwei",
+        estimate.gas_limit,
+        estimate.gas_price_gwei()
+    );
     println!("Pool endpoints: {}", pool.endpoint_count());
 
     // Print metrics
@@ -431,7 +438,8 @@ async fn test_retry_logic_simulation() {
         use_jitter: true,
     };
 
-    let _executor = TransactionExecutor::new(adapter.provider().clone()).with_retry_config(retry_config);
+    let _executor =
+        TransactionExecutor::new(adapter.provider().clone()).with_retry_config(retry_config);
 
     // Even though we can't actually test failed transactions without funds,
     // we can verify the executor is configured correctly
@@ -459,9 +467,7 @@ async fn test_concurrent_balance_queries() {
     let mut tasks = vec![];
     for addr in addresses {
         let adapter_clone = adapter.clone();
-        let task = tokio::spawn(async move {
-            adapter_clone.get_balance(addr).await
-        });
+        let task = tokio::spawn(async move { adapter_clone.get_balance(addr).await });
         tasks.push(task);
     }
 
