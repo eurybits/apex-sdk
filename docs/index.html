@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Apex SDK - Unified Rust SDK for Substrate & EVM Blockchain Development">
+    <title>Apex SDK - Unified Rust SDK for Substrate & EVM</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #8b5cf6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .features {
+            padding: 80px 0;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .code-section {
+            background: var(--bg-card);
+            padding: 60px 0;
+        }
+
+        .code-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+        }
+
+        pre {
+            background: var(--bg-dark);
+            padding: 25px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .docs-section {
+            padding: 80px 0;
+        }
+
+        .docs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .doc-link {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+            display: block;
+        }
+
+        .doc-link:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .doc-link h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background: var(--bg-card);
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Apex SDK</h1>
+            <p class="tagline">Unified Rust SDK for Substrate & EVM Blockchain Development</p>
+            <div class="cta-buttons">
+                <a href="QUICK_START.html" class="btn btn-primary">Get Started</a>
+                <a href="https://github.com/kherldhussein/apex-sdk" class="btn btn-secondary">View on GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="container">
+            <h2>Why Apex SDK?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Unified Interface</h3>
+                    <p>Single API for both Substrate and EVM blockchains. Build cross-chain applications with ease.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Compile-Time Safety</h3>
+                    <p>Catch errors before deployment with Rust's type system. No more runtime surprises.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Native Performance</h3>
+                    <p>Rust-based implementation delivers optimal execution speed. Up to 6x faster than alternatives.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Cross-Chain Ready</h3>
+                    <p>Built-in support for cross-chain communication between Substrate and EVM ecosystems.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Modular Architecture</h3>
+                    <p>Easily extend with new blockchain protocols. Clean separation of concerns.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Developer Friendly</h3>
+                    <p>Comprehensive documentation, examples, and a growing community to support you.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="code-section">
+        <div class="container">
+            <h2>Quick Example</h2>
+            <pre><code>use apex_sdk::prelude::*;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    // Initialize SDK with unified configuration
+    let sdk = ApexSDK::builder()
+        .with_substrate_endpoint("wss://polkadot.api.onfinality.io/public-ws")
+        .with_evm_endpoint("https://mainnet.infura.io/v3/YOUR_KEY")
+        .build()
+        .await?;
+
+    // Create a cross-chain transaction with compile-time type safety
+    let tx = sdk
+        .transaction()
+        .from_substrate_account(alice)
+        .to_evm_address("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7")
+        .amount(1000_u128)
+        .build()?;
+
+    // Execute with automatic routing
+    let result = sdk.execute(tx).await?;
+    println!("Transaction successful: {:?}", result);
+
+    Ok(())
+}</code></pre>
+        </div>
+    </section>
+
+    <section class="docs-section">
+        <div class="container">
+            <h2>Documentation</h2>
+            <div class="docs-grid">
+                <a href="QUICK_START.html" class="doc-link">
+                    <h3>Quick Start</h3>
+                    <p>Get up and running in under 5 minutes</p>
+                </a>
+                <a href="API.html" class="doc-link">
+                    <h3>API Reference</h3>
+                    <p>Complete API documentation</p>
+                </a>
+                <a href="https://github.com/kherldhussein/apex-sdk/tree/main/examples" class="doc-link">
+                    <h3>Examples</h3>
+                    <p>DeFi, NFT, DAO, and more</p>
+                </a>
+                <a href="CONTRIBUTING.html" class="doc-link">
+                    <h3>Contributing</h3>
+                    <p>Help build the future of cross-chain</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" style="background: var(--bg-card);">
+        <div class="container">
+            <h2>Supported Chains</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Substrate</h3>
+                    <p>Polkadot • Kusama</p>
+                </div>
+                <div class="feature-card">
+                    <h3>EVM</h3>
+                    <p>Ethereum • BSC • Polygon • Avalanche</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Hybrid</h3>
+                    <p>Moonbeam • Astar</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Apex SDK. Licensed under Apache 2.0</p>
+            <div class="footer-links">
+                <a href="https://github.com/kherldhussein/apex-sdk">GitHub</a>
+                <a href="https://github.com/kherldhussein/apex-sdk/issues">Issues</a>
+                <a href="SECURITY.html">Security</a>
+                <a href="https://github.com/kherldhussein/apex-sdk/blob/main/LICENSE">License</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

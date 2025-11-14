@@ -14,7 +14,7 @@ version = "0.1.0"
 edition = "2021"
 description = "Unified Rust SDK for Substrate & EVM Blockchain Development"
 authors = ["Khalid Hussein <kherld.hussein@gmail.com>"]
-rust-version = "1.75"
+rust-version = "1.85"
 license = "Apache-2.0"
 repository = "https://github.com/kherldhussein/apex-sdk"
 homepage = "https://github.com/kherldhussein/apex-sdk"
@@ -49,6 +49,12 @@ bs58 = "0.5"
 url = "2.5"
 tracing = "0.1"
 tracing-subscriber = "0.3"
+rand = "0.9.2"
+
+# Dev-dependencies
+proptest = "1.4"
+criterion = "0.7.0"
+mockall = "0.13.1"
 
 # Internal workspace dependencies
 apex-sdk-core = { path = "apex-sdk-core" }

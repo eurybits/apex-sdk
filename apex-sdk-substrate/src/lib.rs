@@ -86,7 +86,7 @@ pub struct PalletInfo<'a> {
     adapter: &'a SubstrateAdapter,
 }
 
-impl<'a> PalletInfo<'a> {
+impl PalletInfo<'_> {
     /// Get the pallet name
     pub fn name(&self) -> &str {
         &self.name

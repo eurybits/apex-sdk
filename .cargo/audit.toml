@@ -1,0 +1,51 @@
+# cargo-audit configuration for Apex SDK
+# https://docs.rs/cargo-audit/latest/cargo_audit/
+
+[advisories]
+# Ignore specific advisories (both vulnerabilities and warnings) with documented justification
+ignore = [
+    # === VULNERABILITIES ===
+    
+    # ring 0.16.20 AES panic vulnerability (RUSTSEC-2025-0009)
+    # ------------------------------------------------
+    # Source: ethers -> ethers-providers -> jsonwebtoken -> ring 0.16.20
+    # Issue: AES functions may panic when overflow checking is enabled
+    # Risk Assessment: LOW
+    #   - Not exploitable in JWT validation context used by ethers
+    #   - No QUIC protocol usage in our codebase
+    #   - Affects 1 in 2^32 packets, not applicable to our use case
+    # Mitigation Plan:
+    #   - Short-term: Documented acceptance with low risk
+    #   - Long-term: Migration to Alloy (ethers replacement) in v1.0
+    # Tracking: Part of Alloy migration roadmap (see PRODUCTION_ROADMAP.md)
+    "RUSTSEC-2025-0009",
+    
+    # === UNMAINTAINED WARNINGS ===
+
+    # ring 0.16.x unmaintained (RUSTSEC-2025-0010)
+    # ------------------------------------------------
+    # Same dependency chain as RUSTSEC-2025-0009
+    # Update: Rustls team now maintains ring for security patches
+    # Mitigation: Same as RUSTSEC-2025-0009 - Alloy migration
+    "RUSTSEC-2025-0010",
+
+    # fxhash 0.2.1 unmaintained (RUSTSEC-2025-0057)
+    # Source: ethers-providers -> hashers -> fxhash
+    # Type: Hash function optimization
+    # Risk: None - no known vulnerabilities
+    # Mitigation: Resolved with Alloy migration
+    "RUSTSEC-2025-0057",
+
+    # instant 0.1.13 unmaintained (RUSTSEC-2024-0384)
+    # Source: ethers-providers, ethers-middleware -> instant
+    # Type: Cross-platform time measurement
+    # Risk: None - no security vulnerabilities
+    # Mitigation: Resolved with Alloy migration
+    "RUSTSEC-2024-0384",
+]
+
+[database]
+# Fetch advisory database from RustSec
+url = "https://github.com/RustSec/advisory-db.git"
+path = "~/.cargo/advisory-db"
+stale = false

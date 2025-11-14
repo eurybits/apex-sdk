@@ -1,0 +1,50 @@
+# Site settings
+title: Apex SDK Documentation
+description: Unified Rust SDK for Substrate & EVM Blockchain Development
+theme: jekyll-theme-cayman
+show_downloads: true
+github:
+  repository_url: https://github.com/kherldhussein/apex-sdk
+  zip_url: https://github.com/kherldhussein/apex-sdk/archive/refs/heads/main.zip
+  tar_url: https://github.com/kherldhussein/apex-sdk/archive/refs/heads/main.tar.gz
+  repository_name: apex-sdk
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Quick Start
+    url: /QUICK_START
+  - title: API Reference
+    url: /API
+  - title: Contributing
+    url: /CONTRIBUTING
+  - title: Security
+    url: /SECURITY
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
