@@ -1,0 +1,8 @@
+# Rust toolchain configuration
+# This ensures consistent Rust version across all environments (local + CI)
+# Edition 2024 support requires Rust 1.85.0 or later
+
+[toolchain]
+channel = "1.85"
+components = ["rustfmt", "clippy"]
+profile = "minimal"
