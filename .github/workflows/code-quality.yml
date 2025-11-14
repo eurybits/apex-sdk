@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.84
+        uses: dtolnay/rust-toolchain@1.85
 
       - name: Install cargo-geiger (unsafe code detection)
         run: cargo install --locked cargo-geiger
@@ -112,7 +112,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.84
+        uses: dtolnay/rust-toolchain@1.85
 
       - name: Generate dependency graph
         run: |
@@ -133,7 +133,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@1.84
+        uses: dtolnay/rust-toolchain@1.85
 
       - name: Install cargo-bloat
         run: cargo install --locked cargo-bloat
