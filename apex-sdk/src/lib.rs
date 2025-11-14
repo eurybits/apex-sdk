@@ -1,6 +1,6 @@
 //! # Apex SDK
 //!
-//! Unified Rust SDK for Substrate & EVM blockchain development.
+//! The industry's first unified Rust SDK for Substrate & EVM blockchain development.
 //!
 //! ## Features
 //!
@@ -29,6 +29,7 @@
 pub mod builder;
 pub mod error;
 pub mod sdk;
+pub mod transaction;
 
 pub use apex_sdk_core as core;
 pub use apex_sdk_evm as evm;
@@ -38,11 +39,13 @@ pub use apex_sdk_types as types;
 pub use builder::ApexSDKBuilder;
 pub use error::{Error, Result};
 pub use sdk::ApexSDK;
+pub use transaction::{Transaction, TransactionBuilder, TransactionResult};
 
 /// Common imports for convenience
 pub mod prelude {
     pub use crate::builder::ApexSDKBuilder;
     pub use crate::error::{Error, Result};
     pub use crate::sdk::ApexSDK;
+    pub use crate::transaction::{Transaction, TransactionBuilder, TransactionResult};
     pub use apex_sdk_types::{Address, Chain, ChainType, TransactionStatus};
 }
