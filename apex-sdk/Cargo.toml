@@ -32,10 +32,6 @@ proptest = { workspace = true }
 mockall = { workspace = true }
 criterion = { workspace = true }
 
-[[example]]
-name = "basic_transfer"
-path = "../examples/basic-transfer/main.rs"
-
 [[bench]]
 name = "transaction_benchmarks"
 harness = false
