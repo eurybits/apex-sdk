@@ -26,7 +26,11 @@ pub mod transaction;
 pub mod wallet;
 pub mod xcm;
 
-#[cfg(feature = "typed")]
+#[cfg(any(
+    feature = "typed-polkadot",
+    feature = "typed-kusama",
+    feature = "typed-westend"
+))]
 pub mod metadata;
 
 pub use cache::{Cache, CacheConfig};
