@@ -176,18 +176,18 @@ impl Chain {
             // Substrate
             Chain::Polkadot => vec![
                 "wss://polkadot.api.onfinality.io/public-ws",
-                "wss://rpc.ibp.network/polkadot", 
-                "wss://polkadot.dotters.network"
+                "wss://rpc.ibp.network/polkadot",
+                "wss://polkadot.dotters.network",
             ],
             Chain::Kusama => vec![
                 "wss://kusama.api.onfinality.io/public-ws",
                 "wss://rpc.ibp.network/kusama",
-                "wss://kusama.dotters.network"
+                "wss://kusama.dotters.network",
             ],
             Chain::Westend => vec![
                 "wss://westend-rpc.polkadot.io",
                 "wss://rpc.ibp.network/westend",
-                "wss://westend.dotters.network"
+                "wss://westend.dotters.network",
             ],
             // For other chains, return the single default endpoint
             _ => vec![self.default_endpoint()],
