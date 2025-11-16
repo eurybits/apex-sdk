@@ -207,10 +207,20 @@ impl ApexSDK {
     /// ```
     pub fn is_chain_supported(&self, chain: &Chain) -> bool {
         match chain {
-            Chain::Polkadot | Chain::Kusama => self.substrate_adapter.is_some(),
-            Chain::Ethereum | Chain::Polygon | Chain::BinanceSmartChain | Chain::Avalanche => {
-                self.evm_adapter.is_some()
-            }
+            Chain::Polkadot
+            | Chain::Kusama
+            | Chain::Acala
+            | Chain::Phala
+            | Chain::Bifrost
+            | Chain::Westend => self.substrate_adapter.is_some(),
+            Chain::Ethereum
+            | Chain::Polygon
+            | Chain::BinanceSmartChain
+            | Chain::Avalanche
+            | Chain::Arbitrum
+            | Chain::Optimism
+            | Chain::ZkSync
+            | Chain::Base => self.evm_adapter.is_some(),
             Chain::Moonbeam | Chain::Astar => {
                 self.substrate_adapter.is_some() && self.evm_adapter.is_some()
             }
@@ -224,12 +234,24 @@ impl ApexSDK {
         tx_hash: &str,
     ) -> Result<TransactionStatus> {
         match chain {
-            Chain::Polkadot | Chain::Kusama => self
+            Chain::Polkadot
+            | Chain::Kusama
+            | Chain::Acala
+            | Chain::Phala
+            | Chain::Bifrost
+            | Chain::Westend => self
                 .substrate()?
                 .get_transaction_status(tx_hash)
                 .await
                 .map_err(Error::Substrate),
-            Chain::Ethereum | Chain::Polygon | Chain::BinanceSmartChain | Chain::Avalanche => self
+            Chain::Ethereum
+            | Chain::Polygon
+            | Chain::BinanceSmartChain
+            | Chain::Avalanche
+            | Chain::Arbitrum
+            | Chain::Optimism
+            | Chain::ZkSync
+            | Chain::Base => self
                 .evm()?
                 .get_transaction_status(tx_hash)
                 .await
@@ -259,10 +281,22 @@ impl ApexSDK {
 
         // Validate that the required adapters are configured
         match transaction.source_chain {
-            Chain::Polkadot | Chain::Kusama => {
+            Chain::Polkadot
+            | Chain::Kusama
+            | Chain::Acala
+            | Chain::Phala
+            | Chain::Bifrost
+            | Chain::Westend => {
                 self.substrate()?;
             }
-            Chain::Ethereum | Chain::Polygon | Chain::BinanceSmartChain | Chain::Avalanche => {
+            Chain::Ethereum
+            | Chain::Polygon
+            | Chain::BinanceSmartChain
+            | Chain::Avalanche
+            | Chain::Arbitrum
+            | Chain::Optimism
+            | Chain::ZkSync
+            | Chain::Base => {
                 self.evm()?;
             }
             Chain::Moonbeam | Chain::Astar => {
@@ -309,8 +343,8 @@ impl ApexSDK {
             source_tx_hash,
             destination_tx_hash,
             status: TransactionStatus::Confirmed {
-                block_number: 12345,
-                confirmations: 1,
+                block_hash: "0xabc123".to_string(),
+                block_number: Some(12345),
             },
             block_number: Some(12345),
             gas_used: Some(21000),
