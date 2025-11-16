@@ -97,30 +97,33 @@ cargo install --path ./cli
 
 ## Documentation
 
-### Core Documentation
+📚 **[Complete Documentation Hub](./docs/DOCUMENTATION_HUB.md)** - Your one-stop guide
 
-- [Getting Started Guide](https://github.kherldhussein/apex-sdk/blob/main/docs/getting-started.md)
-- [API Reference](https://github.kherldhussein/apex-sdk/blob/main/docs/api)
-- [Architecture Overview](https://github.kherldhussein/apex-sdk/blob/main/docs/architecture)
-- [Best Practices](https://github.kherldhussein/apex-sdk/blob/main/docs/best-practices)
-- [API Reference](https://github.kherldhussein/apex-sdk/blob/main/docs/api)
+### Quick Links
 
-### Tutorials
-
-- [Building Your First Cross-Chain dApp](https://github.kherldhussein/apex-sdk/blob/main/docs/tutorials/first-dapp)
-- [Migrating from Web3.js/Ethers.js](https://github.kherldhussein/apex-sdk/blob/main/docs/tutorials/migration)
-- [Advanced Cross-Chain Patterns](https://github.kherldhussein/apex-sdk/blob/main/docs/tutorials/advanced-patterns)
-- [Security Considerations](https://github.kherldhussein/apex-sdk/blob/main/docs/tutorials/security)
-- [Best Practices](https://github.kherldhussein/apex-sdk/blob/main/docs/best-practices)
+| Resource | Description |
+|----------|-------------|
+| [**Quick Start**](./docs/QUICK_START.md) | Get started in 5 minutes |
+| [**API Reference**](./docs/API.md) | Complete API documentation |
+| [**CLI Guide**](./docs/CLI_GUIDE.md) | Command-line tools guide |
+| [**Roadmap**](./docs/ROADMAP.md) | Development roadmap & priorities |
+| [**Security**](./docs/SECURITY.md) | Security policies & reporting |
 
 ### Examples
 
 Check out the [`examples/`](./examples) directory for complete working examples:
 
-- [`basic-transfer/`](./examples/basic-transfer) - Simple cross-chain transfers
-- [`defi-aggregator/`](./examples/defi-aggregator) - Cross-chain DeFi aggregator
-- [`nft-bridge/`](./examples/nft-bridge) - NFT bridging between chains
-- [`dao-governance/`](./examples/dao-governance) - Multi-chain DAO implementation
+- [`account-manager/`](./examples/account-manager/) - Multi-chain account management
+- [`price-oracle/`](./examples/price-oracle/) - Cross-chain price aggregation
+- [`contract-orchestration/`](./examples/contract-orchestration/) - Smart contract deployment
+- [`parachain-assets/`](./examples/parachain-assets/) - Parachain asset management
+
+### Advanced Topics
+
+- [**Typed Metadata**](./docs/TYPED_METADATA.md) - Compile-time type safety
+- [**Testing Framework**](./docs/TESTING_FRAMEWORK.md) - Comprehensive testing
+- [**Security Audit**](./docs/SECURITY_AUDIT.md) - Security review results
+- [**Ecosystem Integration**](./docs/ECOSYSTEM_INTEGRATION.md) - Third-party integrations
 
 ## Contributing
 

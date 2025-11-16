@@ -1,13 +1,29 @@
 # Apex SDK Documentation
 
-Welcome to the Apex SDK documentation! This site provides comprehensive guides and API references for building cross-chain applications with Apex SDK.
+Welcome to Apex SDK! Build cross-chain applications with confidence using Rust's type safety and performance.
 
-## Navigation
+> **New here?** Start with the [**Quick Start Guide**](QUICK_START.md) to build your first cross-chain app in 5 minutes!
 
-- **[Quick Start Guide](QUICK_START.md)** - Get started in under 5 minutes
-- **[API Reference](API.md)** - Complete API documentation
-- **[Contributing Guide](CONTRIBUTING.md)** - Learn how to contribute
-- **[Security Policy](SECURITY.md)** - Security reporting and policies
+## Quick Navigation
+
+### For New Users
+- [**Quick Start**](QUICK_START.md) - 5-minute setup guide
+- [**Documentation Hub**](DOCUMENTATION_HUB.md) - Complete resource center
+- [**Examples**](../examples/) - Working code samples
+- [**CLI Guide**](CLI_GUIDE.md) - Master the command-line tools
+
+### For Developers
+- [**API Reference**](API.md) - Complete API documentation
+- [**Testing Framework**](TESTING_FRAMEWORK.md) - Write comprehensive tests
+- [**Security Guide**](SECURITY.md) - Security best practices
+- [**Contributing**](CONTRIBUTING.md) - Join the community
+
+### For Planning
+- [**Roadmap**](ROADMAP.md) - Future development plans
+- [**UX Improvements**](../UX_IMPROVEMENTS_APPLIED.md) - Recent enhancements
+- [**Security Audit**](SECURITY_AUDIT.md) - Audit results
+
+---
 
 ## What is Apex SDK?
 
@@ -80,12 +96,17 @@ apex new my-project
 
 ## Examples
 
-Check out our comprehensive examples:
+Check out our comprehensive examples in the [`examples/`](../examples/) directory:
 
-- [Basic Transfer](https://github.com/kherldhussein/apex-sdk/tree/main/examples/basic-transfer) - Simple cross-chain transfers
-- [DeFi Aggregator](https://github.com/kherldhussein/apex-sdk/tree/main/examples/defi-aggregator) - Multi-chain DeFi aggregation
-- [NFT Bridge](https://github.com/kherldhussein/apex-sdk/tree/main/examples/nft-bridge) - Cross-chain NFT bridging
-- [DAO Governance](https://github.com/kherldhussein/apex-sdk/tree/main/examples/dao-governance) - Multi-chain DAO implementation
+- [**Account Manager**](../examples/account-manager/) - Multi-chain account management
+- [**Price Oracle**](../examples/price-oracle/) - Cross-chain price aggregation
+- [**Contract Orchestration**](../examples/contract-orchestration/) - Smart contract deployment
+- [**Parachain Assets**](../examples/parachain-assets/) - Parachain asset management
+
+Each example includes:
+- Complete working code
+- Detailed README with explanations
+- Step-by-step instructions
 
 ## Community
 
