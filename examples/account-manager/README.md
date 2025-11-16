@@ -187,9 +187,9 @@ Both are cryptographically secure, just different algorithms.
 
 ## Learn More
 
-- [Substrate Accounts](https://docs.substrate.io/fundamentals/accounts-addresses-keys/)
+- [Substrate Accounts](https://docs.polkadot.com/fundamentals/accounts-addresses-keys/)
 - [EVM Account Abstraction](https://ethereum.org/en/roadmap/account-abstraction/)
-- [SR25519 Signatures](https://wiki.polkadot.network/docs/learn-cryptography)
+- [SR25519 Signatures](https://wiki.polkadot.com/docs/learn-cryptography)
 - [ECDSA (secp256k1)](https://en.bitcoin.it/wiki/Secp256k1)
 - [Apex SDK Documentation](https://docs.rs/apex-sdk/)
 

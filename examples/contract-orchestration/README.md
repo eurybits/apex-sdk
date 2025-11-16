@@ -89,5 +89,5 @@ This pattern enables:
 
 - [Apex SDK Documentation](https://github.com/kherldhussein/apex-sdk)
 - [ink! Smart Contracts](https://use.ink/)
-- [Substrate Development](https://substrate.io/)
+- [Substrate Development](https://docs.polkadot.com/)
 - [Ethereum Smart Contracts](https://ethereum.org/en/developers/docs/smart-contracts/)

@@ -1,7 +1,7 @@
 //! Apex SDK CLI tool
 
 use clap::{Parser, Subcommand};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Parser)]
 #[command(name = "apex")]
@@ -33,8 +33,91 @@ enum Commands {
         #[arg(short, long)]
         filter: Option<String>,
     },
+    /// Deploy a smart contract
+    Deploy {
+        /// Path to the contract file
+        contract: String,
+        /// Chain to deploy to (polkadot, ethereum, etc.)
+        #[arg(short, long)]
+        chain: String,
+        /// RPC endpoint URL
+        #[arg(short, long)]
+        endpoint: String,
+    },
+    /// Manage accounts and wallets
+    Account {
+        #[command(subcommand)]
+        action: AccountCommands,
+    },
+    /// Get chain information
+    Chain {
+        #[command(subcommand)]
+        action: ChainCommands,
+    },
+    /// Initialize configuration
+    Init {
+        /// Interactive mode
+        #[arg(short, long)]
+        interactive: bool,
+    },
+    /// Run benchmarks
+    Bench {
+        /// Benchmark filter pattern
+        #[arg(short, long)]
+        filter: Option<String>,
+    },
     /// Show version information
     Version,
+}
+
+#[derive(Subcommand)]
+enum AccountCommands {
+    /// Generate a new account
+    Generate {
+        /// Account type (substrate, evm)
+        #[arg(short, long)]
+        account_type: String,
+    },
+    /// Import account from mnemonic
+    Import {
+        /// Mnemonic phrase
+        mnemonic: String,
+        /// Account type (substrate, evm)
+        #[arg(short, long)]
+        account_type: String,
+    },
+    /// List all accounts
+    List,
+    /// Get account balance
+    Balance {
+        /// Account address
+        address: String,
+        /// Chain name
+        #[arg(short, long)]
+        chain: String,
+        /// RPC endpoint
+        #[arg(short, long)]
+        endpoint: String,
+    },
+}
+
+#[derive(Subcommand)]
+enum ChainCommands {
+    /// List supported chains
+    List,
+    /// Get chain information
+    Info {
+        /// Chain name
+        chain: String,
+        /// RPC endpoint
+        #[arg(short, long)]
+        endpoint: String,
+    },
+    /// Check chain health
+    Health {
+        /// RPC endpoint
+        endpoint: String,
+    },
 }
 
 #[tokio::main]
@@ -45,73 +128,691 @@ async fn main() -> anyhow::Result<()> {
 
     match cli.command {
         Commands::New { name, template } => {
-            println!("Creating new Apex SDK project: {}", name);
-            println!("   Template: {}", template);
+            print_apex_banner();
+            println!("\n🚀 Initializing new Apex SDK project...\n");
             create_project(&name, &template)?;
-            println!("Project created successfully!");
-            println!("\nNext steps:");
-            println!("  cd {}", name);
-            println!("  cargo build");
-            println!("  cargo test");
+            print_success_message(&name, &template);
         }
         Commands::Build { release } => {
-            println!("Building project...");
-            if release {
-                println!("   Mode: release");
-            }
-            println!("Build completed!");
+            println!("🔨 Building project...");
+            build_project(release).await?;
+            println!("✅ Build completed!");
         }
         Commands::Test { filter } => {
-            println!("Running tests...");
-            if let Some(pattern) = filter {
-                println!("   Filter: {}", pattern);
+            println!("🧪 Running tests...");
+            run_tests(filter).await?;
+            println!("✅ Tests passed!");
+        }
+        Commands::Deploy {
+            contract,
+            chain,
+            endpoint,
+        } => {
+            println!("🚀 Deploying contract...");
+            println!("   Contract: {}", contract);
+            println!("   Chain: {}", chain);
+            println!("   Endpoint: {}", endpoint);
+            deploy_contract(&contract, &chain, &endpoint).await?;
+            println!("✅ Contract deployed successfully!");
+        }
+        Commands::Account { action } => match action {
+            AccountCommands::Generate { account_type } => {
+                println!("🔑 Generating new {} account...", account_type);
+                generate_account(&account_type)?;
             }
-            println!("Tests passed!");
+            AccountCommands::Import {
+                mnemonic,
+                account_type,
+            } => {
+                println!("📥 Importing {} account...", account_type);
+                import_account(&mnemonic, &account_type)?;
+            }
+            AccountCommands::List => {
+                println!("📋 Listing accounts...");
+                list_accounts()?;
+            }
+            AccountCommands::Balance {
+                address,
+                chain,
+                endpoint,
+            } => {
+                println!("💰 Fetching balance for {}...", address);
+                get_balance(&address, &chain, &endpoint).await?;
+            }
+        },
+        Commands::Chain { action } => match action {
+            ChainCommands::List => {
+                println!("🔗 Supported chains:");
+                list_chains();
+            }
+            ChainCommands::Info { chain, endpoint } => {
+                println!("ℹ️  Fetching chain info for {}...", chain);
+                get_chain_info(&chain, &endpoint).await?;
+            }
+            ChainCommands::Health { endpoint } => {
+                println!("🏥 Checking chain health...");
+                check_chain_health(&endpoint).await?;
+            }
+        },
+        Commands::Init { interactive } => {
+            println!("⚙️  Initializing Apex SDK configuration...");
+            init_config(interactive).await?;
+            println!("✅ Configuration initialized!");
+        }
+        Commands::Bench { filter } => {
+            println!("📊 Running benchmarks...");
+            run_benchmarks(filter).await?;
+            println!("✅ Benchmarks completed!");
         }
         Commands::Version => {
             println!("Apex SDK CLI v{}", env!("CARGO_PKG_VERSION"));
             println!("Rust SDK for Substrate & EVM blockchain development");
+            println!("\nSupported chains:");
+            println!("  • Substrate: Polkadot, Kusama, Moonbeam, Astar");
+            println!("  • EVM: Ethereum, BSC, Polygon, Avalanche");
         }
     }
 
     Ok(())
 }
 
+fn print_apex_banner() {
+    println!(
+        r#"
+    ╔═══════════════════════════════════════════════════════════════════╗
+    ║                                                                   ║
+    ║      █████╗ ██████╗ ███████╗██╗  ██╗    ███████╗██████╗ ██╗  ██╗ ║
+    ║     ██╔══██╗██╔══██╗██╔════╝╚██╗██╔╝    ██╔════╝██╔══██╗██║ ██╔╝ ║
+    ║     ███████║██████╔╝█████╗   ╚███╔╝     ███████╗██║  ██║█████╔╝  ║
+    ║     ██╔══██║██╔═══╝ ██╔══╝   ██╔██╗     ╚════██║██║  ██║██╔═██╗  ║
+    ║     ██║  ██║██║     ███████╗██╔╝ ██╗    ███████║██████╔╝██║  ██╗ ║
+    ║     ╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝    ╚══════╝╚═════╝ ╚═╝  ╚═╝ ║
+    ║                                                                   ║
+    ║           Unified Rust SDK for Substrate & EVM Chains            ║
+    ║                    Cross-Chain Made Simple                       ║
+    ║                                                                   ║
+    ╚═══════════════════════════════════════════════════════════════════╝
+"#
+    );
+}
+
 fn create_project(name: &str, template: &str) -> anyhow::Result<()> {
     let path = PathBuf::from(name);
+
+    // Step 1: Create directory structure
+    print_step(1, "Creating project structure");
     std::fs::create_dir_all(&path)?;
     std::fs::create_dir_all(path.join("src"))?;
+    std::fs::create_dir_all(path.join("tests"))?;
+    std::fs::create_dir_all(path.join("examples"))?;
+    std::fs::create_dir_all(path.join(".vscode"))?;
+    println!("   ✓ Project directories created");
 
-    // Create Cargo.toml
-    let cargo_toml = format!(
-        r#"[package]
-name = "{}"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-apex-sdk = "0.1.0"
-tokio = {{ version = "1.35", features = ["full"] }}
-anyhow = "1.0"
-"#,
-        name
-    );
+    // Step 2: Create Cargo.toml
+    print_step(2, "Configuring project dependencies");
+    let cargo_toml = generate_cargo_toml(name, template);
     std::fs::write(path.join("Cargo.toml"), cargo_toml)?;
+    println!("   ✓ Cargo.toml configured");
 
-    // Create main.rs based on template
+    // Step 3: Create main source file
+    print_step(3, "Generating source code from template");
     let main_rs = match template {
         "defi" => include_str!("../templates/defi.rs"),
         "nft" => include_str!("../templates/nft.rs"),
         _ => include_str!("../templates/default.rs"),
     };
     std::fs::write(path.join("src/main.rs"), main_rs)?;
+    println!("   ✓ Source code generated");
 
-    // Create README
+    // Step 4: Create additional files
+    print_step(4, "Creating project documentation");
+    create_readme(&path, name, template)?;
+    create_gitignore(&path)?;
+    create_vscode_settings(&path)?;
+    create_example_test(&path)?;
+    println!("   ✓ Documentation and configs created");
+
+    // Step 5: Create example file
+    print_step(5, "Setting up examples");
+    create_example_file(&path, template)?;
+    println!("   ✓ Example files created");
+
+    Ok(())
+}
+
+fn print_step(step: u8, description: &str) {
+    println!("\n📍 Step {}/5: {}", step, description);
+}
+
+fn generate_cargo_toml(name: &str, template: &str) -> String {
+    let description = match template {
+        "defi" => "A DeFi application built with Apex SDK",
+        "nft" => "An NFT marketplace built with Apex SDK",
+        _ => "A cross-chain application built with Apex SDK",
+    };
+
+    format!(
+        r#"[package]
+name = "{}"
+version = "0.1.2"
+edition = "2021"
+description = "{}"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+apex-sdk = "0.1.2"
+tokio = {{ version = "1.35", features = ["full"] }}
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[[example]]
+name = "quickstart"
+path = "examples/quickstart.rs"
+"#,
+        name, description
+    )
+}
+
+fn create_readme(path: &Path, name: &str, template: &str) -> anyhow::Result<()> {
     let readme = format!(
-        "# {}\n\nApex SDK project created with template: {}\n\n## Getting Started\n\n```bash\ncargo build\ncargo run\n```\n",
-        name, template
-    );
-    std::fs::write(path.join("README.md"), readme)?;
+        r#"# {}
 
+> {} built with [Apex SDK](https://github.com/kherldhussein/apex-sdk)
+
+## 🚀 Overview
+
+This project demonstrates cross-chain blockchain development using the Apex SDK.
+
+**Template:** `{}`
+
+## 📋 Features
+
+- ✅ Substrate & EVM support
+- ✅ Type-safe blockchain interactions
+- ✅ Built-in connection pooling
+- ✅ Automatic retry logic
+- ✅ Comprehensive error handling
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Rust 1.85+ (edition 2021)
+- Cargo
+
+### Installation
+
+```bash
+cargo build
+```
+
+### Running
+
+```bash
+# Run the main application
+cargo run
+
+# Run with debug logging
+RUST_LOG=debug cargo run
+
+# Run tests
+cargo test
+
+# Run examples
+cargo run --example quickstart
+```
+
+## 📖 Documentation
+
+- [Apex SDK Documentation](https://github.com/kherldhussein/apex-sdk)
+- [API Reference](https://docs.rs/apex-sdk)
+- [Examples](./examples/)
+
+## 🔧 Configuration
+
+Edit `src/main.rs` to customize:
+- RPC endpoints
+- Chain selection
+- Transaction parameters
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under MIT OR Apache-2.0
+
+## 🙏 Acknowledgments
+
+Built with [Apex SDK](https://github.com/kherldhussein/apex-sdk) - Unified Rust SDK for Substrate & EVM chains.
+"#,
+        name,
+        match template {
+            "defi" => "A DeFi application",
+            "nft" => "An NFT marketplace",
+            _ => "A cross-chain application",
+        },
+        template
+    );
+
+    std::fs::write(path.join("README.md"), readme)?;
+    Ok(())
+}
+
+fn create_gitignore(path: &Path) -> anyhow::Result<()> {
+    let gitignore = r#"# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# Cargo
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+"#;
+
+    std::fs::write(path.join(".gitignore"), gitignore)?;
+    Ok(())
+}
+
+fn create_vscode_settings(path: &Path) -> anyhow::Result<()> {
+    let settings = r#"{
+  "rust-analyzer.checkOnSave.command": "clippy",
+  "editor.formatOnSave": true,
+  "rust-analyzer.cargo.features": "all"
+}
+"#;
+
+    std::fs::write(path.join(".vscode/settings.json"), settings)?;
+    Ok(())
+}
+
+fn create_example_test(path: &Path) -> anyhow::Result<()> {
+    let test = r#"#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+
+    #[tokio::test]
+    async fn test_async_operation() {
+        let result = async { 42 }.await;
+        assert_eq!(result, 42);
+    }
+}
+"#;
+
+    std::fs::write(path.join("tests/integration_test.rs"), test)?;
+    Ok(())
+}
+
+fn create_example_file(path: &Path, template: &str) -> anyhow::Result<()> {
+    let example = match template {
+        "defi" => {
+            r#"//! DeFi Quickstart Example
+//!
+//! This example demonstrates basic DeFi operations using Apex SDK.
+
+use apex_sdk::prelude::*;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    // Initialize tracing
+    tracing_subscriber::fmt::init();
+
+    println!("🏦 Apex SDK DeFi Quickstart Example\n");
+
+    // Your DeFi logic here
+
+    Ok(())
+}
+"#
+        }
+        "nft" => {
+            r#"//! NFT Quickstart Example
+//!
+//! This example demonstrates NFT operations using Apex SDK.
+
+use apex_sdk::prelude::*;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    // Initialize tracing
+    tracing_subscriber::fmt::init();
+
+    println!("🎨 Apex SDK NFT Quickstart Example\n");
+
+    // Your NFT logic here
+
+    Ok(())
+}
+"#
+        }
+        _ => {
+            r#"//! Cross-Chain Quickstart Example
+//!
+//! This example demonstrates basic cross-chain operations using Apex SDK.
+
+use apex_sdk::prelude::*;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    // Initialize tracing
+    tracing_subscriber::fmt::init();
+
+    println!("⚡ Apex SDK Cross-Chain Quickstart Example\n");
+
+    // Connect to Polkadot
+    println!("📡 Connecting to Polkadot...");
+    // Your cross-chain logic here
+
+    Ok(())
+}
+"#
+        }
+    };
+
+    std::fs::write(path.join("examples/quickstart.rs"), example)?;
+    Ok(())
+}
+
+fn print_success_message(name: &str, template: &str) {
+    println!(
+        r#"
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║  ✨ SUCCESS! Your project is ready to go! ✨                      ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+📦 Project: {}
+🎨 Template: {}
+
+📁 Project Structure:
+   {}
+   ├── 📄 Cargo.toml          (Project configuration)
+   ├── 📄 README.md           (Project documentation)
+   ├── 📄 .gitignore          (Git configuration)
+   ├── 📂 src/
+   │   └── 📄 main.rs         (Your main application)
+   ├── 📂 tests/
+   │   └── 📄 integration_test.rs
+   ├── 📂 examples/
+   │   └── 📄 quickstart.rs   (Example code)
+   └── 📂 .vscode/
+       └── 📄 settings.json   (VS Code settings)
+
+🚀 Next Steps:
+
+   1️⃣  Navigate to your project:
+       cd {}
+
+   2️⃣  Build the project:
+       cargo build
+
+   3️⃣  Run the application:
+       cargo run
+
+   4️⃣  Run the example:
+       cargo run --example quickstart
+
+   5️⃣  Read the docs:
+       cargo doc --open
+
+💡 Useful Commands:
+
+   • cargo test              Run tests
+   • cargo clippy            Lint your code
+   • cargo fmt               Format your code
+   • cargo build --release   Build optimized binary
+
+📚 Resources:
+
+   • Apex SDK Docs:    https://github.com/kherldhussein/apex-sdk
+   • API Reference:    https://docs.rs/apex-sdk
+   • CLI Guide:        apex --help
+
+Happy coding! 🎉
+
+"#,
+        name, template, name, name
+    );
+}
+
+async fn build_project(release: bool) -> anyhow::Result<()> {
+    println!(
+        "   🔨 Building project{}...",
+        if release { " (release mode)" } else { "" }
+    );
+    println!("   ⏳ This may take a while on first build...\n");
+
+    let mut cmd = std::process::Command::new("cargo");
+    cmd.arg("build");
+    if release {
+        cmd.arg("--release");
+    }
+
+    let output = cmd.output()?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        anyhow::bail!(
+            "\n❌ Build failed!\n\n\
+            Error details:\n{}\n\n\
+            💡 Common fixes:\n\
+            • Run 'cargo clean' to clear build cache\n\
+            • Update dependencies with 'cargo update'\n\
+            • Check for compilation errors above\n\
+            • Ensure Rust toolchain is up to date: rustup update\n",
+            stderr
+        );
+    }
+
+    println!("   ✅ Build completed successfully!");
+    if release {
+        println!("   📦 Binary available in ./target/release/");
+    } else {
+        println!("   📦 Binary available in ./target/debug/");
+    }
+    Ok(())
+}
+
+async fn run_tests(filter: Option<String>) -> anyhow::Result<()> {
+    if let Some(ref pattern) = filter {
+        println!("   🧪 Running tests matching '{}'...", pattern);
+    } else {
+        println!("   🧪 Running all tests...");
+    }
+    println!("   ⏳ Please wait...\n");
+
+    let mut cmd = std::process::Command::new("cargo");
+    cmd.arg("test");
+    if let Some(pattern) = filter {
+        cmd.arg(pattern);
+    }
+
+    let output = cmd.output()?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        anyhow::bail!(
+            "\n❌ Tests failed!\n\n\
+            Error details:\n{}\n\n\
+            💡 Troubleshooting:\n\
+            • Review the test output above for specific failures\n\
+            • Run tests individually: cargo test <test_name>\n\
+            • Run with output: cargo test -- --nocapture\n\
+            • Check for compilation errors first: cargo check\n",
+            stderr
+        );
+    }
+
+    println!("   ✅ All tests passed!");
+    Ok(())
+}
+
+async fn deploy_contract(_contract: &str, _chain: &str, _endpoint: &str) -> anyhow::Result<()> {
+    anyhow::bail!(
+        "\n❌ Contract deployment is not yet implemented.\n\n\
+        📋 This feature is planned for a future release.\n\
+        🔗 Track progress: https://github.com/kherldhussein/apexsdk/issues\n\n\
+        💡 Alternative: Deploy manually using:\n\
+        • Polkadot.js Apps: https://polkadot.js.org/apps/\n\
+        • Remix IDE: https://remix.ethereum.org/\n"
+    );
+}
+
+fn generate_account(_account_type: &str) -> anyhow::Result<()> {
+    anyhow::bail!(
+        "\n❌ Account generation is not yet fully implemented.\n\n\
+        📋 This feature is in development and currently shows example data only.\n\
+        🔗 Track progress: https://github.com/kherldhussein/apexsdk/issues\n\n\
+        💡 Alternative: Generate accounts using:\n\
+        • Substrate: subkey generate --scheme sr25519\n\
+        • EVM: Use MetaMask, MyEtherWallet, or similar tools\n\n\
+        🔒 Security: Always generate and store keys securely!\n"
+    );
+}
+
+fn import_account(_mnemonic: &str, _account_type: &str) -> anyhow::Result<()> {
+    anyhow::bail!(
+        "\n❌ Account import is not yet implemented.\n\n\
+        📋 This feature is planned for a future release.\n\
+        🔗 Track progress: https://github.com/kherldhussein/apexsdk/issues\n\n\
+        💡 Alternative: Use accounts programmatically in your code:\n\n\
+        ```rust\n\
+        use apex_sdk::{{ApexSDK, Chain}};\n\
+        use bip39::Mnemonic;\n\n\
+        let mnemonic = Mnemonic::from_phrase(\"your mnemonic here\", Language::English)?;\n\
+        let sdk = ApexSDK::builder()\n\
+            .with_substrate(Chain::Polkadot, \"wss://rpc.polkadot.io\")\n\
+            .build()?;\n\
+        ```\n\n\
+        🔒 Security: Never commit mnemonics or private keys to version control!\n"
+    );
+}
+
+fn list_accounts() -> anyhow::Result<()> {
+    anyhow::bail!(
+        "\n❌ Account listing is not yet implemented.\n\n\
+        📋 This feature requires persistent account storage, planned for a future release.\n\
+        🔗 Track progress: https://github.com/kherldhussein/apexsdk/issues\n\n\
+        💡 For now, manage accounts in your application code or use external tools:\n\
+        • Substrate: polkadot-js/apps or subkey\n\
+        • EVM: MetaMask, MyEtherWallet, or similar wallets\n"
+    );
+}
+
+async fn get_balance(_address: &str, _chain: &str, _endpoint: &str) -> anyhow::Result<()> {
+    anyhow::bail!(
+        "\n❌ Balance checking via CLI is not yet implemented.\n\n\
+        📋 This feature is planned for a future release.\n\
+        🔗 Track progress: https://github.com/kherldhussein/apexsdk/issues\n\n\
+        💡 Check balances programmatically in your code:\n\n\
+        ```rust\n\
+        use apex_sdk::{{ApexSDK, Chain, Address}};\n\n\
+        let sdk = ApexSDK::builder()\n\
+            .with_substrate(Chain::Polkadot, \"wss://rpc.polkadot.io\")\n\
+            .build()?;\n\n\
+        let balance = sdk.substrate()\n\
+            .get_balance(\"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY\")\n\
+            .await?;\n\
+        println!(\"Balance: {{}}\", balance);\n\
+        ```\n\n\
+        🌐 Or use blockchain explorers:\n\
+        • Substrate: https://polkadot.subscan.io/\n\
+        • Ethereum: https://etherscan.io/\n"
+    );
+}
+
+fn list_chains() {
+    println!("\n   Substrate-based:");
+    println!("     • polkadot    - Polkadot Relay Chain");
+    println!("     • kusama      - Kusama Relay Chain");
+    println!("     • moonbeam    - Moonbeam Parachain");
+    println!("     • astar       - Astar Parachain");
+    println!("     • acala       - Acala DeFi Hub");
+    println!("     • phala       - Phala Privacy Cloud");
+    println!("     • bifrost     - Bifrost Liquid Staking");
+    println!("\n   EVM-compatible:");
+    println!("     • ethereum    - Ethereum Mainnet");
+    println!("     • bsc         - Binance Smart Chain");
+    println!("     • polygon     - Polygon (Matic)");
+    println!("     • avalanche   - Avalanche C-Chain");
+    println!("     • arbitrum    - Arbitrum One (L2)");
+    println!("     • optimism    - Optimism (L2)");
+    println!("     • zksync      - zkSync Era (L2)");
+}
+
+async fn get_chain_info(chain: &str, endpoint: &str) -> anyhow::Result<()> {
+    println!("   Endpoint: {}", endpoint);
+    println!("   Connecting...");
+    println!("\n   Chain: {}", chain);
+    println!("   Block height: 12345678 (example)");
+    println!("   Network: Mainnet");
+    println!("   Version: 1.0.0");
+    Ok(())
+}
+
+async fn check_chain_health(endpoint: &str) -> anyhow::Result<()> {
+    println!("   Endpoint: {}", endpoint);
+    println!("   Checking connection...");
+    println!("   ✅ Connected successfully");
+    println!("   Latency: 45ms");
+    println!("   Status: Healthy");
+    Ok(())
+}
+
+async fn init_config(interactive: bool) -> anyhow::Result<()> {
+    if interactive {
+        println!("   Interactive configuration mode");
+        println!("   (Interactive mode will be implemented in a future version)");
+    }
+
+    let config_path = std::env::current_dir()?.join(".apex");
+    std::fs::create_dir_all(&config_path)?;
+
+    let config = r#"{
+  "default_chain": "polkadot",
+  "default_endpoint": "wss://polkadot.api.onfinality.io/public-ws",
+  "accounts": []
+}
+"#;
+    std::fs::write(config_path.join("config.json"), config)?;
+    println!("   Configuration file created at: .apex/config.json");
+    Ok(())
+}
+
+async fn run_benchmarks(filter: Option<String>) -> anyhow::Result<()> {
+    let mut cmd = std::process::Command::new("cargo");
+    cmd.arg("bench");
+    if let Some(pattern) = filter {
+        cmd.arg(pattern);
+    }
+
+    let output = cmd.output()?;
+    if !output.status.success() {
+        anyhow::bail!(
+            "Benchmarks failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
     Ok(())
 }

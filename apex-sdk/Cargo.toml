@@ -13,10 +13,10 @@ categories = ["cryptography::cryptocurrencies", "api-bindings"]
 readme = "README.md"
 
 [dependencies]
-apex-sdk-core = { path = "../apex-sdk-core", version = "0.1.1" }
-apex-sdk-substrate = { path = "../apex-sdk-substrate", version = "0.1.1" }
-apex-sdk-evm = { path = "../apex-sdk-evm", version = "0.1.1" }
-apex-sdk-types = { path = "../apex-sdk-types", version = "0.1.1" }
+apex-sdk-core = { path = "../apex-sdk-core", version = "0.1.2" }
+apex-sdk-substrate = { path = "../apex-sdk-substrate", version = "0.1.2" }
+apex-sdk-evm = { path = "../apex-sdk-evm", version = "0.1.2" }
+apex-sdk-types = { path = "../apex-sdk-types", version = "0.1.2" }
 tokio = { workspace = true }
 async-trait = { workspace = true }
 anyhow = { workspace = true }
@@ -25,6 +25,7 @@ tracing = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 hex = { workspace = true }
+rand = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["test-util"] }

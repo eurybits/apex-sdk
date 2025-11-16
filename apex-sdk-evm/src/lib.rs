@@ -241,7 +241,7 @@ impl EvmAdapter {
                 // Get current block number for confirmations
                 let current_block = self.provider.get_block_number().await?;
 
-                let confirmations = if let Some(block_number) = receipt.block_number {
+                let _confirmations = if let Some(block_number) = receipt.block_number {
                     current_block.as_u64().saturating_sub(block_number.as_u64()) as u32
                 } else {
                     0
@@ -250,8 +250,11 @@ impl EvmAdapter {
                 // Check if transaction succeeded (status == 1)
                 if receipt.status == Some(1.into()) {
                     Ok(TransactionStatus::Confirmed {
-                        block_number: receipt.block_number.unwrap_or_default().as_u64(),
-                        confirmations,
+                        block_hash: receipt
+                            .block_hash
+                            .map(|h| format!("{:?}", h))
+                            .unwrap_or_default(),
+                        block_number: receipt.block_number.map(|n| n.as_u64()),
                     })
                 } else {
                     Ok(TransactionStatus::Failed {

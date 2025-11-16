@@ -7,7 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0]
+## [0.1.2] - 2025-11-16
+
+### Added
+- Enhanced Substrate adapter with comprehensive parachain support
+- Improved error handling and user feedback throughout the CLI
+- Added progress indicators for long-running operations
+- Enhanced documentation with better UX guidelines
+
+### Changed
+- Updated RPC endpoints for better reliability
+  - Replaced broken BSC endpoint with `bsc.publicnode.com`
+  - Updated Substrate documentation URLs to current official sites
+  - Validated and retained OnFinality endpoints for Polkadot ecosystem
+- Improved CLI user experience with clearer status messages
+- Enhanced error messages with contextual guidance
+- Updated roadmap with more realistic and flexible timelines
+
+### Fixed
+- Resolved CI failures related to formatting and metadata
+- Fixed broken documentation links across all README files
+- Addressed audit warnings and security recommendations
+- Improved test stability and coverage
+
+### Security
+- Comprehensive URL audit and replacement of broken/restricted endpoints
+- Enhanced endpoint validation and backup mechanism
+- Updated dependency versions for security improvements
+
+### Documentation
+- Updated all README files with working links and current information
+- Enhanced API documentation with better examples
+- Improved getting started guide with clearer instructions
+- Added comprehensive PR documentation for substrate implementation
+
+## [0.1.1] - 2025-11-10
+
+### Added
+- Minor bug fixes and improvements
+- Enhanced testing infrastructure
+- Improved documentation
+
+## [0.1.0] - 2025-11-01
 
 ### Added
 - Initial Rust implementation of Apex SDK

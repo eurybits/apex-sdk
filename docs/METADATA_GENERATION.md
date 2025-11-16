@@ -353,7 +353,7 @@ cargo test --features typed
 
 - [subxt Documentation](https://docs.rs/subxt)
 - [subxt Examples](https://github.com/paritytech/subxt/tree/master/examples)
-- [Substrate Metadata](https://docs.substrate.io/reference/scale-codec/)
+- [Substrate Metadata](https://docs.polkadot.com/reference/scale-codec/)
 - [SCALE Codec](https://github.com/paritytech/parity-scale-codec)
 
 ## Support
