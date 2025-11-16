@@ -26,8 +26,11 @@
 //! }
 //! ```
 
+pub mod advanced;
 pub mod builder;
 pub mod error;
+pub mod error_recovery;
+pub mod performance;
 pub mod sdk;
 pub mod transaction;
 
@@ -36,8 +39,15 @@ pub use apex_sdk_evm as evm;
 pub use apex_sdk_substrate as substrate;
 pub use apex_sdk_types as types;
 
+pub use advanced::{
+    BlockInfo, BlockSubscription, EventSubscription, ParallelExecutor, TransactionBatch,
+};
 pub use builder::ApexSDKBuilder;
 pub use error::{Error, Result};
+pub use error_recovery::{with_retry, CircuitBreaker, RetryConfig};
+pub use performance::{
+    batch_execute, parallel_execute, AsyncMemo, BatchConfig, ConnectionPool, RateLimiter,
+};
 pub use sdk::ApexSDK;
 pub use transaction::{Transaction, TransactionBuilder, TransactionResult};
 
@@ -45,6 +55,7 @@ pub use transaction::{Transaction, TransactionBuilder, TransactionResult};
 pub mod prelude {
     pub use crate::builder::ApexSDKBuilder;
     pub use crate::error::{Error, Result};
+    pub use crate::error_recovery::{with_retry, CircuitBreaker, RetryConfig};
     pub use crate::sdk::ApexSDK;
     pub use crate::transaction::{Transaction, TransactionBuilder, TransactionResult};
     pub use apex_sdk_types::{Address, Chain, ChainType, TransactionStatus};

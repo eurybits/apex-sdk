@@ -119,7 +119,7 @@ This pattern enables:
 
 ## Learn More
 
-- [Asset Hub Documentation](https://wiki.polkadot.network/docs/learn-assets)
+- [Asset Hub Documentation](https://wiki.polkadot.com/docs/learn-assets)
 - [Polkadot Parachains](https://polkadot.network/parachains/)
-- [XCM Cross-Chain Messaging](https://wiki.polkadot.network/docs/learn-xcm)
+- [XCM Cross-Chain Messaging](https://wiki.polkadot.com/docs/learn-xcm)
 - [Apex SDK Documentation](https://github.com/kherldhussein/apex-sdk)

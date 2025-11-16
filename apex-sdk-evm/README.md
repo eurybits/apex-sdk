@@ -26,7 +26,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-apex-sdk-evm = "0.1"
+apex-sdk-evm = "0.1.2"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -171,8 +171,7 @@ let pool_config = PoolConfig {
 let adapter = EvmAdapter::with_pool(
     vec![
         "https://eth.llamarpc.com",
-        "https://eth.rpc.blxrbdn.com",
-        "https://ethereum.blockpi.network/v1/rpc/public"
+        "https://eth.rpc.blxrbdn.com"
     ],
     pool_config,
 ).await?;
@@ -254,7 +253,7 @@ let eth = EvmAdapter::new("https://eth.llamarpc.com");
 let polygon = EvmAdapter::new("https://polygon-rpc.com");
 
 // BSC
-let bsc = EvmAdapter::new("https://bsc-dataseed.binance.org");
+let bsc = EvmAdapter::new("https://bsc.publicnode.com");
 
 // Arbitrum
 let arbitrum = EvmAdapter::new("https://arb1.arbitrum.io/rpc");

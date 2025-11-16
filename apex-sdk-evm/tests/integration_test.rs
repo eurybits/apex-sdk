@@ -80,11 +80,13 @@ async fn test_get_confirmed_transaction() {
 
     match status {
         TransactionStatus::Confirmed {
+            block_hash,
             block_number,
-            confirmations,
         } => {
-            assert!(block_number > 0, "Expected valid block number");
-            assert!(confirmations > 0, "Expected confirmations");
+            assert!(!block_hash.is_empty(), "Expected valid block hash");
+            if let Some(num) = block_number {
+                assert!(num > 0, "Expected valid block number");
+            }
         }
         _ => panic!("Expected confirmed status, got: {:?}", status),
     }

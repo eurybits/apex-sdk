@@ -107,9 +107,7 @@ impl ApexSDK {
     ///
     /// Always returns a configuration error directing you to use the builder.
     pub async fn new() -> Result<Self> {
-        Err(Error::Config(
-            "Use ApexSDK::builder() to configure the SDK".to_string(),
-        ))
+        Err(Error::config("Use ApexSDK::builder() to configure the SDK"))
     }
 
     /// Get a reference to the Substrate adapter.
@@ -140,7 +138,7 @@ impl ApexSDK {
     pub fn substrate(&self) -> Result<&SubstrateAdapter> {
         self.substrate_adapter
             .as_ref()
-            .ok_or_else(|| Error::Config("Substrate adapter not configured".to_string()))
+            .ok_or_else(|| Error::config("Substrate adapter not configured"))
     }
 
     /// Get a reference to the EVM adapter.
@@ -171,7 +169,7 @@ impl ApexSDK {
     pub fn evm(&self) -> Result<&EvmAdapter> {
         self.evm_adapter
             .as_ref()
-            .ok_or_else(|| Error::Config("EVM adapter not configured".to_string()))
+            .ok_or_else(|| Error::config("EVM adapter not configured"))
     }
 
     /// Check if a specific blockchain is supported by the current SDK configuration.
@@ -207,10 +205,20 @@ impl ApexSDK {
     /// ```
     pub fn is_chain_supported(&self, chain: &Chain) -> bool {
         match chain {
-            Chain::Polkadot | Chain::Kusama => self.substrate_adapter.is_some(),
-            Chain::Ethereum | Chain::Polygon | Chain::BinanceSmartChain | Chain::Avalanche => {
-                self.evm_adapter.is_some()
-            }
+            Chain::Polkadot
+            | Chain::Kusama
+            | Chain::Acala
+            | Chain::Phala
+            | Chain::Bifrost
+            | Chain::Westend => self.substrate_adapter.is_some(),
+            Chain::Ethereum
+            | Chain::Polygon
+            | Chain::BinanceSmartChain
+            | Chain::Avalanche
+            | Chain::Arbitrum
+            | Chain::Optimism
+            | Chain::ZkSync
+            | Chain::Base => self.evm_adapter.is_some(),
             Chain::Moonbeam | Chain::Astar => {
                 self.substrate_adapter.is_some() && self.evm_adapter.is_some()
             }
@@ -224,12 +232,24 @@ impl ApexSDK {
         tx_hash: &str,
     ) -> Result<TransactionStatus> {
         match chain {
-            Chain::Polkadot | Chain::Kusama => self
+            Chain::Polkadot
+            | Chain::Kusama
+            | Chain::Acala
+            | Chain::Phala
+            | Chain::Bifrost
+            | Chain::Westend => self
                 .substrate()?
                 .get_transaction_status(tx_hash)
                 .await
                 .map_err(Error::Substrate),
-            Chain::Ethereum | Chain::Polygon | Chain::BinanceSmartChain | Chain::Avalanche => self
+            Chain::Ethereum
+            | Chain::Polygon
+            | Chain::BinanceSmartChain
+            | Chain::Avalanche
+            | Chain::Arbitrum
+            | Chain::Optimism
+            | Chain::ZkSync
+            | Chain::Base => self
                 .evm()?
                 .get_transaction_status(tx_hash)
                 .await
@@ -259,10 +279,22 @@ impl ApexSDK {
 
         // Validate that the required adapters are configured
         match transaction.source_chain {
-            Chain::Polkadot | Chain::Kusama => {
+            Chain::Polkadot
+            | Chain::Kusama
+            | Chain::Acala
+            | Chain::Phala
+            | Chain::Bifrost
+            | Chain::Westend => {
                 self.substrate()?;
             }
-            Chain::Ethereum | Chain::Polygon | Chain::BinanceSmartChain | Chain::Avalanche => {
+            Chain::Ethereum
+            | Chain::Polygon
+            | Chain::BinanceSmartChain
+            | Chain::Avalanche
+            | Chain::Arbitrum
+            | Chain::Optimism
+            | Chain::ZkSync
+            | Chain::Base => {
                 self.evm()?;
             }
             Chain::Moonbeam | Chain::Astar => {
@@ -309,8 +341,8 @@ impl ApexSDK {
             source_tx_hash,
             destination_tx_hash,
             status: TransactionStatus::Confirmed {
-                block_number: 12345,
-                confirmations: 1,
+                block_hash: "0xabc123".to_string(),
+                block_number: Some(12345),
             },
             block_number: Some(12345),
             gas_used: Some(21000),
@@ -333,7 +365,7 @@ mod tests {
         let result = ApexSDK::new().await;
         assert!(result.is_err());
         match result {
-            Err(Error::Config(_)) => {}
+            Err(Error::Config(_, _)) => {}
             _ => panic!("Expected Config error"),
         }
     }
@@ -350,7 +382,7 @@ mod tests {
         let result = sdk.substrate();
         assert!(result.is_err());
         match result {
-            Err(Error::Config(msg)) => {
+            Err(Error::Config(msg, _)) => {
                 assert!(msg.contains("Substrate adapter not configured"));
             }
             _ => panic!("Expected Config error"),
@@ -369,7 +401,7 @@ mod tests {
         let result = sdk.evm();
         assert!(result.is_err());
         match result {
-            Err(Error::Config(msg)) => {
+            Err(Error::Config(msg, _)) => {
                 assert!(msg.contains("EVM adapter not configured"));
             }
             _ => panic!("Expected Config error"),

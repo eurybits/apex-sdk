@@ -94,13 +94,13 @@ impl TransactionBuilder {
     pub fn build(self) -> Result<Transaction> {
         let from = self
             .from
-            .ok_or_else(|| Error::Transaction("Sender address required".to_string()))?;
+            .ok_or_else(|| Error::transaction("Sender address required"))?;
         let to = self
             .to
-            .ok_or_else(|| Error::Transaction("Recipient address required".to_string()))?;
+            .ok_or_else(|| Error::transaction("Recipient address required"))?;
         let amount = self
             .amount
-            .ok_or_else(|| Error::Transaction("Amount required".to_string()))?;
+            .ok_or_else(|| Error::transaction("Amount required"))?;
 
         // Determine source and destination chains based on addresses if not specified
         let source_chain = self.source_chain.unwrap_or(match &from {
@@ -267,7 +267,7 @@ mod tests {
 
         assert!(result.is_err());
         match result {
-            Err(Error::Transaction(msg)) => {
+            Err(Error::Transaction(msg, _)) => {
                 assert!(msg.contains("Sender address required"));
             }
             _ => panic!("Expected Transaction error"),
@@ -283,7 +283,7 @@ mod tests {
 
         assert!(result.is_err());
         match result {
-            Err(Error::Transaction(msg)) => {
+            Err(Error::Transaction(msg, _)) => {
                 assert!(msg.contains("Recipient address required"));
             }
             _ => panic!("Expected Transaction error"),
@@ -299,7 +299,7 @@ mod tests {
 
         assert!(result.is_err());
         match result {
-            Err(Error::Transaction(msg)) => {
+            Err(Error::Transaction(msg, _)) => {
                 assert!(msg.contains("Amount required"));
             }
             _ => panic!("Expected Transaction error"),
@@ -407,8 +407,8 @@ mod tests {
             source_tx_hash: "0xabc123".to_string(),
             destination_tx_hash: Some("0xdef456".to_string()),
             status: TransactionStatus::Confirmed {
-                block_number: 12345,
-                confirmations: 3,
+                block_hash: "0xblock123".to_string(),
+                block_number: Some(12345),
             },
             block_number: Some(12345),
             gas_used: Some(21000),

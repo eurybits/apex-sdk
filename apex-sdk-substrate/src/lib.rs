@@ -26,11 +26,7 @@ pub mod transaction;
 pub mod wallet;
 pub mod xcm;
 
-#[cfg(any(
-    feature = "typed-polkadot",
-    feature = "typed-kusama",
-    feature = "typed-westend"
-))]
+#[cfg(feature = "typed")]
 pub mod metadata;
 
 pub use cache::{Cache, CacheConfig};
@@ -324,10 +320,18 @@ impl SubstrateAdapter {
                     let confirmations = latest_number - block_num;
 
                     return if success {
-                        Ok(TransactionStatus::Confirmed {
-                            block_number: block_num as u64,
-                            confirmations,
-                        })
+                        // If confirmations >= 10, consider it finalized (Substrate-specific)
+                        if confirmations >= 10 {
+                            Ok(TransactionStatus::Finalized {
+                                block_hash: block_hash.to_string(),
+                                block_number: block_num as u64,
+                            })
+                        } else {
+                            Ok(TransactionStatus::Confirmed {
+                                block_hash: block_hash.to_string(),
+                                block_number: Some(block_num as u64),
+                            })
+                        }
                     } else if let Some(error) = error_msg {
                         Ok(TransactionStatus::Failed { error })
                     } else {

@@ -33,6 +33,10 @@
 use apex_sdk_types::{Address, TransactionStatus};
 use async_trait::async_trait;
 
+/// Mock implementations for testing
+#[cfg(any(test, feature = "mocks"))]
+pub mod mocks;
+
 /// Trait for blockchain adapters
 #[async_trait]
 pub trait ChainAdapter: Send + Sync {

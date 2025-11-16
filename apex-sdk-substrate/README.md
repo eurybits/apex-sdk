@@ -27,7 +27,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-apex-sdk-substrate = "0.1"
+apex-sdk-substrate = "0.1.2"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -35,7 +35,7 @@ tokio = { version = "1.0", features = ["full"] }
 
 ```toml
 [dependencies]
-apex-sdk-substrate = { version = "0.1", features = ["typed-westend"] }
+apex-sdk-substrate = { version = "0.1.2", features = ["typed-westend"] }
 ```
 
 Available features:
@@ -502,6 +502,6 @@ Contributions are welcome! Please read [CONTRIBUTING.md](../CONTRIBUTING.md) for
 ## Support
 
 - [Documentation](https://docs.rs/apex-sdk-substrate)  
-- [Substrate Documentation](https://docs.substrate.io)
-- [Polkadot Documentation](https://wiki.polkadot.network)
+- [Substrate Documentation](https://docs.polkadot.com)
+- [Polkadot Documentation](https://wiki.polkadot.com)
 - [GitHub Issues](https://github.com/kherldhussein/apex-sdk/issues)
