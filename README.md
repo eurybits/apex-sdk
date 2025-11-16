@@ -51,9 +51,9 @@ cargo test
 ```toml
 # Add to your Cargo.toml
 [dependencies]
-apex-sdk = "0.1.0"
-apex-sdk-substrate = "0.1.0"
-apex-sdk-evm = "0.1.0"
+apex-sdk = "0.1.2"
+apex-sdk-substrate = "0.1.2"
+apex-sdk-evm = "0.1.2"
 ```
 
 ### From Source

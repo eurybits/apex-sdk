@@ -24,7 +24,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-apex-sdk-types = "0.1"
+apex-sdk-types = "0.1.2"
 ```
 
 ## Usage

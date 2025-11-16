@@ -83,7 +83,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-apex-sdk = "0.1.0"
+apex-sdk = "0.1.2"
 tokio = { version = "1.35", features = ["full"] }
 ```
 

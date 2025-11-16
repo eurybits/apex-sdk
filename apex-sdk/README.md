@@ -27,7 +27,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-apex-sdk = "0.1"
+apex-sdk = "0.1.2"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -304,7 +304,7 @@ Comprehensive examples are available in the [`examples/`](examples/) directory:
 
 ```toml
 [dependencies]
-apex-sdk = { version = "0.1", features = ["full"] }
+apex-sdk = { version = "0.1.2", features = ["full"] }
 
 # Or choose specific features
 apex-sdk = { 
