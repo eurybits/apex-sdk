@@ -30,6 +30,16 @@ ignore = [
     # Time measurement utility, no security vulnerabilities
     # Will be resolved with migration to Alloy
     "RUSTSEC-2024-0384",
+
+    # derivative 2.2.0 unmaintained via sp-core -> ark-* dependency chain
+    # Transitive dependency from Substrate/Polkadot SDK, no security vulnerabilities
+    # Will be resolved when Substrate updates their dependencies
+    "RUSTSEC-2024-0388",
+
+    # paste 1.0.15 unmaintained via sp-core, sp-runtime
+    # Transitive dependency from Substrate/Polkadot SDK, no security vulnerabilities
+    # Alternative (pastey) available, will be resolved when Substrate migrates
+    "RUSTSEC-2024-0436",
 ]
 
 [licenses]
@@ -50,6 +60,7 @@ allow = [
     "CC0-1.0",
     "MPL-2.0",  # Mozilla Public License 2.0 (webpki-roots)
     "OpenSSL",  # OpenSSL license (ring dependency)
+    "CDLA-Permissive-2.0",  # Community Data License Agreement (webpki-root-certs)
 ]
 # The confidence threshold for detecting a license from license text
 confidence-threshold = 0.8
