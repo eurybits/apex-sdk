@@ -18,6 +18,11 @@ Thumbs.db
 .env
 .env.*
 
+# Internal/Local scripts
+publish.sh
+deploy.sh
+local-*.sh
+
 # Test coverage
 cobertura.xml
 tarpaulin-report.html
