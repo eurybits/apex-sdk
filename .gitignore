@@ -39,3 +39,7 @@ temp/
 /apex-sdk-substrate/src/metadata/*.rs
 !/apex-sdk-substrate/src/metadata/mod.rs
 /apex-sdk-substrate/src/metadata/*.scale
+
+# Cargo cache directories
+~/.cargo/
+.cargo/
