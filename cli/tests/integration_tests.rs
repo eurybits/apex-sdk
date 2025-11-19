@@ -115,11 +115,16 @@ fn test_config_init() {
 
 #[test]
 fn test_account_list_empty() {
+    // This test will use the actual keystore location
+    // In a real implementation, we'd mock or use a temporary keystore
     let output = run_cli(&["account", "list"]).expect("Failed to run account list");
 
+    // The command should succeed even if there are no accounts
+    // (We can't guarantee success since it might find actual accounts)
     let stdout = String::from_utf8_lossy(&output.stdout);
     let stderr = String::from_utf8_lossy(&output.stderr);
 
+    // Either success with account list, or message about no accounts
     assert!(
         stdout.contains("Accounts")
             || stdout.contains("No accounts")
@@ -133,11 +138,13 @@ fn test_invalid_account_type() {
     let output = run_cli(&["account", "generate", "--account-type", "invalid"])
         .expect("Failed to run account generate");
 
+    // Should fail with invalid account type
     assert!(!output.status.success());
 }
 
 #[test]
 fn test_deploy_without_contract() {
+    // Test deploy command with missing required arguments
     let output = run_cli(&[
         "deploy",
         "nonexistent.wasm",
@@ -148,6 +155,7 @@ fn test_deploy_without_contract() {
     ])
     .expect("Failed to run deploy command");
 
+    // Should fail because the contract file doesn't exist
     assert!(!output.status.success());
 }
 
@@ -169,12 +177,15 @@ fn test_new_project_templates() {
         let project_path = temp_dir.path().join(&project_name);
         assert!(project_path.exists());
 
+        // Cleanup for next iteration
         fs::remove_dir_all(&project_path).ok();
     }
 }
 
 #[test]
 fn test_bench_command() {
+    // This test just checks if the bench command exists
+    // Actual benchmark execution would require a proper project
     let output = run_cli(&["bench", "--help"]).expect("Failed to run bench help");
 
     // Help should succeed
@@ -189,8 +200,13 @@ fn test_bench_command() {
 #[cfg(test)]
 mod unit_tests {
     #[test]
-    fn test_keystore_operations() {}
+    fn test_keystore_operations() {
+        // This would test the keystore module directly
+        // For now, we just verify it compiles
+    }
 
     #[test]
-    fn test_config_operations() {}
+    fn test_config_operations() {
+        // This would test the config module directly
+    }
 }

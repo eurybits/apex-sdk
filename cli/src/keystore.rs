@@ -1,7 +1,7 @@
 //! Secure keystore implementation for managing accounts
 
 use aes_gcm::{
-    aead::{Aead, KeyInit, OsRng, generic_array::typenum::U12},
+    aead::{generic_array::typenum::U12, Aead, KeyInit, OsRng},
     Aes256Gcm, Nonce,
 };
 use anyhow::{Context, Result};
@@ -51,10 +51,9 @@ impl Keystore {
     /// Load keystore from disk
     pub fn load(path: &Path) -> Result<Self> {
         if path.exists() {
-            let data = std::fs::read_to_string(path)
-                .context("Failed to read keystore file")?;
-            let keystore: Keystore = serde_json::from_str(&data)
-                .context("Failed to parse keystore file")?;
+            let data = std::fs::read_to_string(path).context("Failed to read keystore file")?;
+            let keystore: Keystore =
+                serde_json::from_str(&data).context("Failed to parse keystore file")?;
             Ok(keystore)
         } else {
             Ok(Self::default())
@@ -68,10 +67,8 @@ impl Keystore {
             std::fs::create_dir_all(parent)?;
         }
 
-        let data = serde_json::to_string_pretty(self)
-            .context("Failed to serialize keystore")?;
-        std::fs::write(path, data)
-            .context("Failed to write keystore file")?;
+        let data = serde_json::to_string_pretty(self).context("Failed to serialize keystore")?;
+        std::fs::write(path, data).context("Failed to write keystore file")?;
 
         // Set restrictive permissions on Unix systems
         #[cfg(unix)]
@@ -126,7 +123,12 @@ impl Keystore {
             .find(|a| a.name == name)
             .ok_or_else(|| anyhow::anyhow!("Account '{}' not found", name))?;
 
-        decrypt_data(&account.encrypted_data, &account.nonce, &account.salt, password)
+        decrypt_data(
+            &account.encrypted_data,
+            &account.nonce,
+            &account.salt,
+            password,
+        )
     }
 
     /// List all account names
@@ -160,7 +162,8 @@ fn derive_key(password: &str, salt: &SaltString) -> Result<[u8; 32]> {
         .hash_password(password.as_bytes(), salt)
         .map_err(|e| anyhow::anyhow!("Failed to hash password: {}", e))?;
 
-    let hash = password_hash.hash
+    let hash = password_hash
+        .hash
         .ok_or_else(|| anyhow::anyhow!("Failed to extract hash"))?;
 
     let mut key = [0u8; 32];
@@ -198,10 +201,14 @@ fn encrypt_data(data: &[u8], password: &str) -> Result<(Vec<u8>, Vec<u8>, Vec<u8
 }
 
 /// Decrypt data using AES-256-GCM
-fn decrypt_data(encrypted: &[u8], nonce_bytes: &[u8], salt_bytes: &[u8], password: &str) -> Result<Vec<u8>> {
+fn decrypt_data(
+    encrypted: &[u8],
+    nonce_bytes: &[u8],
+    salt_bytes: &[u8],
+    password: &str,
+) -> Result<Vec<u8>> {
     // Reconstruct salt
-    let salt_str = std::str::from_utf8(salt_bytes)
-        .context("Invalid salt encoding")?;
+    let salt_str = std::str::from_utf8(salt_bytes).context("Invalid salt encoding")?;
     let salt = SaltString::from_b64(salt_str)
         .map_err(|e| anyhow::anyhow!("Failed to parse salt: {}", e))?;
 
@@ -264,13 +271,15 @@ mod tests {
         let mut keystore = Keystore::default();
         let password = "test_pass";
 
-        keystore.add_account(
-            "test_account".to_string(),
-            AccountType::Substrate,
-            "5GrwvaEF...".to_string(),
-            b"private_key_data",
-            password,
-        ).unwrap();
+        keystore
+            .add_account(
+                "test_account".to_string(),
+                AccountType::Substrate,
+                "5GrwvaEF...".to_string(),
+                b"private_key_data",
+                password,
+            )
+            .unwrap();
 
         let retrieved = keystore.get_account("test_account", password).unwrap();
         assert_eq!(retrieved, b"private_key_data");
@@ -280,13 +289,15 @@ mod tests {
     fn test_keystore_duplicate_name() {
         let mut keystore = Keystore::default();
 
-        keystore.add_account(
-            "test".to_string(),
-            AccountType::Substrate,
-            "addr1".to_string(),
-            b"data1",
-            "pass",
-        ).unwrap();
+        keystore
+            .add_account(
+                "test".to_string(),
+                AccountType::Substrate,
+                "addr1".to_string(),
+                b"data1",
+                "pass",
+            )
+            .unwrap();
 
         let result = keystore.add_account(
             "test".to_string(),
@@ -303,13 +314,15 @@ mod tests {
     fn test_keystore_remove() {
         let mut keystore = Keystore::default();
 
-        keystore.add_account(
-            "test".to_string(),
-            AccountType::Substrate,
-            "addr".to_string(),
-            b"data",
-            "pass",
-        ).unwrap();
+        keystore
+            .add_account(
+                "test".to_string(),
+                AccountType::Substrate,
+                "addr".to_string(),
+                b"data",
+                "pass",
+            )
+            .unwrap();
 
         assert!(keystore.has_account("test"));
         keystore.remove_account("test").unwrap();

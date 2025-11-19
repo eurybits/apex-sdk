@@ -706,7 +706,10 @@ Happy coding!
 }
 
 async fn build_project(release: bool) -> anyhow::Result<()> {
-    println!("   🔨 Building project{}...", if release { " (release mode)" } else { "" });
+    println!(
+        "   🔨 Building project{}...",
+        if release { " (release mode)" } else { "" }
+    );
     println!("   This may take a while on first build...\n");
 
     let mut cmd = std::process::Command::new("cargo");
@@ -771,7 +774,6 @@ async fn run_tests(filter: Option<String>) -> anyhow::Result<()> {
     println!("All tests passed!");
     Ok(())
 }
-
 
 fn list_chains() {
     println!("\n   Substrate Mainnets:");
@@ -846,15 +848,22 @@ async fn get_chain_info(chain: &str, endpoint: &str) -> anyhow::Result<()> {
         println!();
 
         println!("{}", "Runtime:".yellow().bold());
-        println!("  {}: {}", "Spec Version".cyan(), runtime_version.spec_version);
-        println!("  {}: {}", "Transaction Version".dimmed(), runtime_version.transaction_version);
-
+        println!(
+            "  {}: {}",
+            "Spec Version".cyan(),
+            runtime_version.spec_version
+        );
+        println!(
+            "  {}: {}",
+            "Transaction Version".dimmed(),
+            runtime_version.transaction_version
+        );
     } else {
         // EVM chain info
         use ethers::prelude::*;
 
-        let provider = Provider::<Http>::try_from(endpoint)
-            .context("Failed to create EVM provider")?;
+        let provider =
+            Provider::<Http>::try_from(endpoint).context("Failed to create EVM provider")?;
 
         spinner.set_message("Fetching chain data...");
 
@@ -865,9 +874,10 @@ async fn get_chain_info(chain: &str, endpoint: &str) -> anyhow::Result<()> {
         let block_number = provider.get_block_number().await?;
 
         // Get latest block
-        let block = provider.get_block(block_number).await?.ok_or_else(|| {
-            anyhow::anyhow!("Failed to fetch latest block")
-        })?;
+        let block = provider
+            .get_block(block_number)
+            .await?
+            .ok_or_else(|| anyhow::anyhow!("Failed to fetch latest block"))?;
 
         // Get network version
         let network_version = provider.get_net_version().await?;
@@ -878,14 +888,22 @@ async fn get_chain_info(chain: &str, endpoint: &str) -> anyhow::Result<()> {
         println!("  {}: {}", "Chain ID".cyan(), chain_id);
         println!("  {}: {}", "Network Version".dimmed(), network_version);
         println!("  {}: {}", "Block Height".cyan(), block_number);
-        println!("  {}: {:?}", "Block Hash".dimmed(), block.hash.unwrap_or_default());
+        println!(
+            "  {}: {:?}",
+            "Block Hash".dimmed(),
+            block.hash.unwrap_or_default()
+        );
         println!();
 
         println!("{}", "Block Details:".yellow().bold());
         println!("  {}: {}", "Timestamp".dimmed(), block.timestamp);
         println!("  {}: {}", "Gas Limit".dimmed(), block.gas_limit);
         println!("  {}: {}", "Gas Used".dimmed(), block.gas_used);
-        println!("  {}: {}", "Transactions".dimmed(), block.transactions.len());
+        println!(
+            "  {}: {}",
+            "Transactions".dimmed(),
+            block.transactions.len()
+        );
 
         // Determine network name from chain ID
         let network_name = match chain_id.as_u64() {
@@ -946,14 +964,13 @@ async fn check_chain_health(endpoint: &str) -> anyhow::Result<()> {
         println!("  {}: {}ms", "Latency".cyan(), latency.as_millis());
         println!("  {}: {}", "Latest Block".dimmed(), block.number());
         println!("  {}: Healthy", "Status".green().bold());
-
     } else {
         // EVM health check
         use ethers::prelude::*;
 
         let start = Instant::now();
-        let provider = Provider::<Http>::try_from(endpoint)
-            .context("Failed to create EVM provider")?;
+        let provider =
+            Provider::<Http>::try_from(endpoint).context("Failed to create EVM provider")?;
 
         spinner.set_message("Fetching chain data...");
 
@@ -978,7 +995,6 @@ async fn check_chain_health(endpoint: &str) -> anyhow::Result<()> {
 
     Ok(())
 }
-
 
 async fn run_benchmarks(filter: Option<String>) -> anyhow::Result<()> {
     let mut cmd = std::process::Command::new("cargo");

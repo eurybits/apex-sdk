@@ -28,8 +28,8 @@ fn generate_substrate_account(name: Option<String>) -> Result<()> {
     ::rand::rng().fill_bytes(&mut entropy);
 
     // Generate mnemonic from entropy
-    let mnemonic = bip39::Mnemonic::from_entropy(&entropy)
-        .context("Failed to generate mnemonic")?;
+    let mnemonic =
+        bip39::Mnemonic::from_entropy(&entropy).context("Failed to generate mnemonic")?;
     let mnemonic_phrase = mnemonic.to_string();
 
     // Generate keypair from mnemonic
@@ -72,16 +72,16 @@ fn generate_substrate_account(name: Option<String>) -> Result<()> {
 
 /// Generate an EVM account
 fn generate_evm_account(name: Option<String>) -> Result<()> {
-    use ethers::prelude::*;
     use ::rand::RngCore;
+    use ethers::prelude::*;
 
     // Generate random entropy (16 bytes = 128 bits = 12 words)
     let mut entropy = [0u8; 16];
     ::rand::rng().fill_bytes(&mut entropy);
 
     // Generate mnemonic from entropy
-    let mnemonic = bip39::Mnemonic::from_entropy(&entropy)
-        .context("Failed to generate mnemonic")?;
+    let mnemonic =
+        bip39::Mnemonic::from_entropy(&entropy).context("Failed to generate mnemonic")?;
     let mnemonic_phrase = mnemonic.to_string();
 
     // Generate wallet from mnemonic
@@ -104,12 +104,7 @@ fn generate_evm_account(name: Option<String>) -> Result<()> {
 
     // Ask if user wants to save the account
     if let Some(account_name) = name {
-        save_account_interactive(
-            account_name,
-            AccountType::Evm,
-            address,
-            &mnemonic_phrase,
-        )?;
+        save_account_interactive(account_name, AccountType::Evm, address, &mnemonic_phrase)?;
     } else {
         println!("\n{}", "Tip:".cyan());
         println!(
@@ -126,8 +121,7 @@ pub fn import_account(mnemonic: &str, account_type: &str, name: String) -> Resul
     use ethers::signers::Signer;
 
     // Validate mnemonic
-    let mnemonic_obj: bip39::Mnemonic = mnemonic.parse()
-        .context("Invalid mnemonic phrase")?;
+    let mnemonic_obj: bip39::Mnemonic = mnemonic.parse().context("Invalid mnemonic phrase")?;
 
     match account_type.to_lowercase().as_str() {
         "substrate" | "sub" => {
@@ -228,9 +222,13 @@ pub fn list_accounts() -> Result<()> {
         println!("   {}: {}", "Type".dimmed(), account.account_type);
         println!("   {}: {}", "Address".dimmed(), account.address);
 
-        let created = chrono::DateTime::from_timestamp(account.created_at as i64, 0)
-            .unwrap_or_default();
-        println!("   {}: {}", "Created".dimmed(), created.format("%Y-%m-%d %H:%M:%S"));
+        let created =
+            chrono::DateTime::from_timestamp(account.created_at as i64, 0).unwrap_or_default();
+        println!(
+            "   {}: {}",
+            "Created".dimmed(),
+            created.format("%Y-%m-%d %H:%M:%S")
+        );
     }
 
     println!("\n{}: {}", "Total".cyan(), accounts.len());
@@ -250,14 +248,16 @@ pub fn export_account(name: &str) -> Result<()> {
 
     println!("\n{}", "🔓 Export Account".yellow().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
-    println!("{}", "Warning: This will display your secret mnemonic!".red());
+    println!(
+        "{}",
+        "Warning: This will display your secret mnemonic!".red()
+    );
 
-    let password = rpassword::prompt_password("Enter password: ")
-        .context("Failed to read password")?;
+    let password =
+        rpassword::prompt_password("Enter password: ").context("Failed to read password")?;
 
     let mnemonic_bytes = keystore.get_account(name, &password)?;
-    let mnemonic = String::from_utf8(mnemonic_bytes)
-        .context("Failed to decode mnemonic")?;
+    let mnemonic = String::from_utf8(mnemonic_bytes).context("Failed to decode mnemonic")?;
 
     println!("\n{}: {}", "Mnemonic".yellow().bold(), mnemonic);
     println!("\n{}", "Security Reminder:".red().bold());
@@ -281,7 +281,10 @@ pub fn remove_account(name: &str) -> Result<()> {
     println!("{}", "═══════════════════════════════════════".dimmed());
     println!("{}", "Warning: This action cannot be undone!".red());
 
-    print!("Are you sure you want to remove account '{}'? (yes/no): ", name);
+    print!(
+        "Are you sure you want to remove account '{}'? (yes/no): ",
+        name
+    );
     std::io::stdout().flush()?;
 
     let mut input = String::new();
@@ -314,7 +317,8 @@ mod tests {
 
     #[test]
     fn test_validate_mnemonic() {
-        let valid_mnemonic = "legal winner thank year wave sausage worth useful legal winner thank yellow";
+        let valid_mnemonic =
+            "legal winner thank year wave sausage worth useful legal winner thank yellow";
         let result: Result<bip39::Mnemonic, _> = valid_mnemonic.parse();
         assert!(result.is_ok());
 

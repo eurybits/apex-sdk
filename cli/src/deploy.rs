@@ -17,7 +17,15 @@ pub async fn deploy_contract(
         || endpoint.starts_with("wss://")
         || matches!(
             chain.to_lowercase().as_str(),
-            "polkadot" | "kusama" | "paseo" | "westend" | "moonbeam" | "astar" | "acala" | "phala" | "bifrost"
+            "polkadot"
+                | "kusama"
+                | "paseo"
+                | "westend"
+                | "moonbeam"
+                | "astar"
+                | "acala"
+                | "phala"
+                | "bifrost"
         );
 
     if is_substrate {
@@ -35,8 +43,8 @@ async fn deploy_substrate_contract(
     account_name: Option<String>,
     dry_run: bool,
 ) -> Result<()> {
+    use sp_core::{crypto::Ss58Codec, sr25519, Pair};
     use subxt::{OnlineClient, PolkadotConfig};
-    use sp_core::{sr25519, Pair, crypto::Ss58Codec};
 
     let title = if dry_run {
         "Dry-Run: Substrate WASM Contract Deployment"
@@ -50,7 +58,10 @@ async fn deploy_substrate_contract(
     println!("{}: {}", "Chain".dimmed(), chain);
     println!("{}: {}", "Endpoint".dimmed(), endpoint);
     if dry_run {
-        println!("{}: DRY RUN - No transaction will be broadcast", "Mode".yellow().bold());
+        println!(
+            "{}: DRY RUN - No transaction will be broadcast",
+            "Mode".yellow().bold()
+        );
     }
     println!();
 
@@ -63,10 +74,13 @@ async fn deploy_substrate_contract(
     // Check if it's a .contract or .wasm file
     let extension = path.extension().and_then(|s| s.to_str());
     match extension {
-        Some("contract") | Some("wasm") => {},
+        Some("contract") | Some("wasm") => {}
         Some(ext) => {
-            println!("{}", format!("Warning: Expected .contract or .wasm file, got .{}", ext).yellow());
-        },
+            println!(
+                "{}",
+                format!("Warning: Expected .contract or .wasm file, got .{}", ext).yellow()
+            );
+        }
         None => {
             anyhow::bail!("Contract file must have .contract or .wasm extension");
         }
@@ -77,8 +91,7 @@ async fn deploy_substrate_contract(
     spinner.set_message("Reading contract file...");
     spinner.enable_steady_tick(std::time::Duration::from_millis(100));
 
-    let contract_code = std::fs::read(contract_path)
-        .context("Failed to read contract file")?;
+    let contract_code = std::fs::read(contract_path).context("Failed to read contract file")?;
 
     spinner.set_message(format!("Contract size: {} bytes", contract_code.len()));
 
@@ -93,8 +106,7 @@ async fn deploy_substrate_contract(
         let keystore = crate::keystore::Keystore::load(&keystore_path)?;
 
         let mnemonic_bytes = keystore.get_account(&name, &password)?;
-        let mnemonic = String::from_utf8(mnemonic_bytes)
-            .context("Failed to decode mnemonic")?;
+        let mnemonic = String::from_utf8(mnemonic_bytes).context("Failed to decode mnemonic")?;
 
         (name, mnemonic)
     } else {
@@ -105,7 +117,9 @@ async fn deploy_substrate_contract(
             apex deploy {} --chain {} --endpoint {} --account <name>\n\n\
             Or create an account first:\n  \
             apex account generate --type substrate",
-            contract_path, chain, endpoint
+            contract_path,
+            chain,
+            endpoint
         );
     };
 
@@ -117,22 +131,22 @@ async fn deploy_substrate_contract(
         .context("Failed to connect to Substrate endpoint")?;
 
     // Create keypair from mnemonic
-    let mnemonic_obj: bip39::Mnemonic = mnemonic.parse()
-        .context("Invalid mnemonic phrase")?;
+    let mnemonic_obj: bip39::Mnemonic = mnemonic.parse().context("Invalid mnemonic phrase")?;
     let seed = mnemonic_obj.to_seed("");
     let pair = sr25519::Pair::from_seed_slice(&seed[..32])
         .map_err(|e| anyhow::anyhow!("Failed to generate keypair: {:?}", e))?;
 
     let signer_address = pair.public().to_ss58check();
 
-    spinner.finish_with_message(format!(
-        "Connected with account: {}",
-        signer_name
-    ));
+    spinner.finish_with_message(format!("Connected with account: {}", signer_name));
 
     println!("\n{}", "Deployment Summary".cyan().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
-    println!("{}: {} bytes", "Contract Size".dimmed(), contract_code.len());
+    println!(
+        "{}: {} bytes",
+        "Contract Size".dimmed(),
+        contract_code.len()
+    );
     println!("{}: {}", "Deployer".dimmed(), signer_name);
     println!("{}: {}", "Address".dimmed(), signer_address);
 
@@ -166,8 +180,10 @@ async fn deploy_substrate_contract(
         println!();
         println!("{}", "Ready for Real Deployment".cyan().bold());
         println!("To perform the actual deployment, run the same command without --dry-run:");
-        println!("  apex deploy {} --chain {} --endpoint {} --account {}",
-                 contract_path, chain, endpoint, signer_name);
+        println!(
+            "  apex deploy {} --chain {} --endpoint {} --account {}",
+            contract_path, chain, endpoint, signer_name
+        );
         println!();
         println!("{}", "Note:".yellow());
         println!("Substrate contract deployment will:");
@@ -203,7 +219,8 @@ async fn deploy_substrate_contract(
         );
 
         // Create signer from seed
-        let seed_bytes: [u8; 32] = seed[..32].try_into()
+        let seed_bytes: [u8; 32] = seed[..32]
+            .try_into()
             .map_err(|_| anyhow::anyhow!("Invalid seed length"))?;
         let signer = subxt_signer::sr25519::Keypair::from_secret_key(seed_bytes)
             .map_err(|e| anyhow::anyhow!("Failed to create signer: {:?}", e))?;
@@ -232,7 +249,10 @@ async fn deploy_substrate_contract(
         println!("{}: {} bytes", "Code Size".dimmed(), contract_code.len());
 
         // Extract code hash from events
-        let code_hash = format!("0x{}", hex::encode(&contract_code[..32.min(contract_code.len())]));
+        let code_hash = format!(
+            "0x{}",
+            hex::encode(&contract_code[..32.min(contract_code.len())])
+        );
         println!("{}: {}", "Code Hash (approx)".dimmed(), code_hash);
 
         println!("\n{}", "Next Steps:".cyan());
@@ -256,8 +276,8 @@ async fn deploy_evm_contract(
     account_name: Option<String>,
     dry_run: bool,
 ) -> Result<()> {
-    use ethers::prelude::*;
     use ethers::middleware::SignerMiddleware;
+    use ethers::prelude::*;
     use ethers::types::transaction::eip2718::TypedTransaction;
 
     let title = if dry_run {
@@ -272,7 +292,10 @@ async fn deploy_evm_contract(
     println!("{}: {}", "Chain".dimmed(), chain);
     println!("{}: {}", "Endpoint".dimmed(), endpoint);
     if dry_run {
-        println!("{}: DRY RUN - No transaction will be broadcast", "Mode".yellow().bold());
+        println!(
+            "{}: DRY RUN - No transaction will be broadcast",
+            "Mode".yellow().bold()
+        );
     }
     println!();
 
@@ -289,18 +312,18 @@ async fn deploy_evm_contract(
             // Raw bytecode
             let code = std::fs::read_to_string(contract_path)
                 .context("Failed to read contract bytecode")?;
-            hex::decode(code.trim().trim_start_matches("0x"))
-                .context("Invalid hex bytecode")?
-        },
+            hex::decode(code.trim().trim_start_matches("0x")).context("Invalid hex bytecode")?
+        }
         Some("json") => {
             // JSON with bytecode (common Solidity compiler output)
-            let json_str = std::fs::read_to_string(contract_path)
-                .context("Failed to read contract JSON")?;
-            let json: serde_json::Value = serde_json::from_str(&json_str)
-                .context("Invalid JSON file")?;
+            let json_str =
+                std::fs::read_to_string(contract_path).context("Failed to read contract JSON")?;
+            let json: serde_json::Value =
+                serde_json::from_str(&json_str).context("Invalid JSON file")?;
 
             // Try to extract bytecode from different JSON formats
-            let bytecode_hex = json.get("bytecode")
+            let bytecode_hex = json
+                .get("bytecode")
                 .or_else(|| json.get("data"))
                 .or_else(|| json.get("object"))
                 .and_then(|v| v.as_str())
@@ -308,10 +331,13 @@ async fn deploy_evm_contract(
 
             hex::decode(bytecode_hex.trim().trim_start_matches("0x"))
                 .context("Invalid hex bytecode in JSON")?
-        },
+        }
         Some(ext) => {
-            anyhow::bail!("Unsupported contract file extension: .{}\nSupported: .bin, .hex, .json", ext);
-        },
+            anyhow::bail!(
+                "Unsupported contract file extension: .{}\nSupported: .bin, .hex, .json",
+                ext
+            );
+        }
         None => {
             anyhow::bail!("Contract file must have an extension (.bin, .hex, or .json)");
         }
@@ -332,8 +358,7 @@ async fn deploy_evm_contract(
         let keystore = crate::keystore::Keystore::load(&keystore_path)?;
 
         let mnemonic_bytes = keystore.get_account(&name, &password)?;
-        let mnemonic = String::from_utf8(mnemonic_bytes)
-            .context("Failed to decode mnemonic")?;
+        let mnemonic = String::from_utf8(mnemonic_bytes).context("Failed to decode mnemonic")?;
 
         (name, mnemonic)
     } else {
@@ -344,20 +369,19 @@ async fn deploy_evm_contract(
             apex deploy {} --chain {} --endpoint {} --account <name>\n\n\
             Or create an account first:\n  \
             apex account generate --type evm",
-            contract_path, chain, endpoint
+            contract_path,
+            chain,
+            endpoint
         );
     };
 
     spinner.set_message("Connecting to chain...");
 
     // Create provider
-    let provider = Provider::<Http>::try_from(endpoint)
-        .context("Failed to create provider")?;
+    let provider = Provider::<Http>::try_from(endpoint).context("Failed to create provider")?;
 
     // Create wallet from mnemonic
-    let wallet: LocalWallet = mnemonic
-        .parse()
-        .context("Failed to parse mnemonic")?;
+    let wallet: LocalWallet = mnemonic.parse().context("Failed to parse mnemonic")?;
 
     let chain_id = provider.get_chainid().await?;
     let wallet = wallet.with_chain_id(chain_id.as_u64());
@@ -392,7 +416,11 @@ async fn deploy_evm_contract(
     // Display deployment info
     println!("\n{}", "Deployment Summary".cyan().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
-    println!("{}: {} bytes", "Bytecode Size".dimmed(), contract_data.len());
+    println!(
+        "{}: {} bytes",
+        "Bytecode Size".dimmed(),
+        contract_data.len()
+    );
     println!("{}: {}", "Deployer".dimmed(), signer_name);
     println!("{}: {:?}", "From Address".dimmed(), wallet.address());
     println!("{}: {}", "Chain ID".dimmed(), chain_id);
@@ -422,16 +450,20 @@ async fn deploy_evm_contract(
         println!();
         println!("{}", "Ready for Real Deployment".cyan().bold());
         println!("To perform the actual deployment, run the same command without --dry-run:");
-        println!("  apex deploy {} --chain {} --endpoint {} --account {}",
-                 contract_path, chain, endpoint, signer_name);
+        println!(
+            "  apex deploy {} --chain {} --endpoint {} --account {}",
+            contract_path, chain, endpoint, signer_name
+        );
         println!();
         println!("{}", "Note:".yellow());
         println!("The actual deployment will:");
         println!("  -Sign the transaction with your private key");
         println!("  -Broadcast to the network");
         println!("  -Wait for confirmation");
-        println!("  -Spend ~{} ETH in gas fees",
-                 ethers::utils::format_units(total_cost, "ether").unwrap_or_default());
+        println!(
+            "  -Spend ~{} ETH in gas fees",
+            ethers::utils::format_units(total_cost, "ether").unwrap_or_default()
+        );
     } else {
         println!("\n{}", "Ready to Deploy".yellow().bold());
         println!("This will spend gas fees from your account.");
@@ -483,12 +515,25 @@ async fn deploy_evm_contract(
 
         println!("\n{}", "Deployment Successful".green().bold());
         println!("{}", "═══════════════════════════════════════".dimmed());
-        println!("{}: {:?}", "Contract Address".green().bold(), contract_address);
+        println!(
+            "{}: {:?}",
+            "Contract Address".green().bold(),
+            contract_address
+        );
         println!("{}: {:?}", "Transaction Hash".cyan(), tx_hash);
-        println!("{}: {}", "Block Number".dimmed(), receipt.block_number.unwrap_or_default());
-        println!("{}: {}", "Gas Used".dimmed(), receipt.gas_used.unwrap_or_default());
+        println!(
+            "{}: {}",
+            "Block Number".dimmed(),
+            receipt.block_number.unwrap_or_default()
+        );
+        println!(
+            "{}: {}",
+            "Gas Used".dimmed(),
+            receipt.gas_used.unwrap_or_default()
+        );
 
-        let actual_cost = receipt.gas_used.unwrap_or_default() * receipt.effective_gas_price.unwrap_or_default();
+        let actual_cost =
+            receipt.gas_used.unwrap_or_default() * receipt.effective_gas_price.unwrap_or_default();
         println!(
             "{}: {} ETH",
             "Actual Cost".yellow(),

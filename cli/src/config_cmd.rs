@@ -17,16 +17,31 @@ pub fn show_config() -> Result<()> {
 
     println!("{}", "Default Settings:".yellow().bold());
     println!("  {}: {}", "default_chain".cyan(), config.default_chain);
-    println!("  {}: {}", "default_endpoint".cyan(), config.default_endpoint);
+    println!(
+        "  {}: {}",
+        "default_endpoint".cyan(),
+        config.default_endpoint
+    );
     println!(
         "  {}: {}",
         "default_account".cyan(),
-        config.default_account.as_ref().unwrap_or(&"none".to_string())
+        config
+            .default_account
+            .as_ref()
+            .unwrap_or(&"none".to_string())
     );
 
     println!("\n{}", "Preferences:".yellow().bold());
-    println!("  {}: {}", "color_output".cyan(), config.preferences.color_output);
-    println!("  {}: {}", "progress_bars".cyan(), config.preferences.progress_bars);
+    println!(
+        "  {}: {}",
+        "color_output".cyan(),
+        config.preferences.color_output
+    );
+    println!(
+        "  {}: {}",
+        "progress_bars".cyan(),
+        config.preferences.progress_bars
+    );
     println!("  {}: {}", "log_level".cyan(), config.preferences.log_level);
 
     if !config.endpoints.is_empty() {
@@ -43,7 +58,10 @@ pub fn show_config() -> Result<()> {
     if let Some(legacy_path) = get_legacy_config_path()? {
         println!("\n{}", "Legacy Configuration Detected".yellow().bold());
         println!("Found old config at: {}", legacy_path.display());
-        println!("Consider migrating to the new location: {}", config_path.display());
+        println!(
+            "Consider migrating to the new location: {}",
+            config_path.display()
+        );
     }
 
     Ok(())
@@ -99,7 +117,10 @@ pub fn validate_config() -> Result<()> {
             println!("{}. {}", idx + 1, warning.yellow());
         }
 
-        println!("\n{}", "These warnings won't prevent the CLI from working,".dimmed());
+        println!(
+            "\n{}",
+            "These warnings won't prevent the CLI from working,".dimmed()
+        );
         println!("{}", "   but may cause issues with some commands.".dimmed());
     }
 
@@ -133,14 +154,17 @@ pub fn reset_config(force: bool) -> Result<()> {
 
     println!("\n{}", "Configuration Reset".green().bold());
     println!("{}: {}", "Config File".dimmed(), config_path.display());
-    println!("\n{}", "Use 'apex config show' to view the default configuration".cyan());
+    println!(
+        "\n{}",
+        "Use 'apex config show' to view the default configuration".cyan()
+    );
 
     Ok(())
 }
 
 /// Initialize configuration interactively
 pub async fn init_config_interactive() -> Result<()> {
-    use dialoguer::{Input, Select, Confirm};
+    use dialoguer::{Confirm, Input, Select};
 
     println!("\n{}", "Initialize Apex SDK Configuration".cyan().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
@@ -167,7 +191,11 @@ pub async fn init_config_interactive() -> Result<()> {
         .interact()?;
 
     // Extract chain name from the display string
-    let default_chain = chains[default_chain_idx].split_whitespace().next().unwrap().to_string();
+    let default_chain = chains[default_chain_idx]
+        .split_whitespace()
+        .next()
+        .unwrap()
+        .to_string();
 
     let default_endpoint: String = Input::new()
         .with_prompt("Enter the default RPC endpoint (or press Enter for default)")
@@ -228,7 +256,10 @@ pub async fn init_config_interactive() -> Result<()> {
 
     println!("\n{}", "Configuration Saved!".green().bold());
     println!("{}: {}", "Config File".dimmed(), config_path.display());
-    println!("\n{}", "Use 'apex config show' to view your configuration".cyan());
+    println!(
+        "\n{}",
+        "Use 'apex config show' to view your configuration".cyan()
+    );
 
     Ok(())
 }

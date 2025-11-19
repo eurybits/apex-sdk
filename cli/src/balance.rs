@@ -27,9 +27,8 @@ pub async fn get_substrate_balance(address: &str, endpoint: &str) -> Result<()> 
     spinner.set_message("Fetching balance...");
 
     // Parse the address directly as AccountId32
-    let account_id: subxt::utils::AccountId32 = address
-        .parse()
-        .context("Invalid Substrate address")?;
+    let account_id: subxt::utils::AccountId32 =
+        address.parse().context("Invalid Substrate address")?;
 
     // Get the account info
     let account_storage = subxt::dynamic::storage(
@@ -69,7 +68,11 @@ pub async fn get_substrate_balance(address: &str, endpoint: &str) -> Result<()> 
         let frozen_balance = account_data
             .at("data")
             .and_then(|data| data.at("frozen"))
-            .or_else(|| account_data.at("data").and_then(|data| data.at("misc_frozen")))
+            .or_else(|| {
+                account_data
+                    .at("data")
+                    .and_then(|data| data.at("misc_frozen"))
+            })
             .and_then(|frozen| frozen.as_u128())
             .unwrap_or(0);
 
@@ -93,7 +96,11 @@ pub async fn get_substrate_balance(address: &str, endpoint: &str) -> Result<()> 
         let total = free_balance + reserved_balance;
         let total_formatted = format_balance(total, divisor);
 
-        println!("{}: {} tokens", "Free Balance".green().bold(), free_formatted);
+        println!(
+            "{}: {} tokens",
+            "Free Balance".green().bold(),
+            free_formatted
+        );
         println!("{}: {} tokens", "Reserved".dimmed(), reserved_formatted);
         println!("{}: {} tokens", "Frozen".dimmed(), frozen_formatted);
         println!("{}: {} tokens", "Total".cyan().bold(), total_formatted);
@@ -104,7 +111,11 @@ pub async fn get_substrate_balance(address: &str, endpoint: &str) -> Result<()> 
         let transferable = free_balance.saturating_sub(frozen_balance);
         let transferable_formatted = format_balance(transferable, divisor);
 
-        println!("\n{}: {} tokens", "Transferable".yellow().bold(), transferable_formatted);
+        println!(
+            "\n{}: {} tokens",
+            "Transferable".yellow().bold(),
+            transferable_formatted
+        );
 
         println!("\n{}", "Note:".yellow());
         println!("Balance precision: {} decimal places", decimals);
@@ -137,14 +148,12 @@ pub async fn get_evm_balance(address: &str, endpoint: &str) -> Result<()> {
     spinner.enable_steady_tick(std::time::Duration::from_millis(100));
 
     // Connect to the provider
-    let provider = Provider::<Http>::try_from(endpoint)
-        .context("Failed to create provider")?;
+    let provider = Provider::<Http>::try_from(endpoint).context("Failed to create provider")?;
 
     spinner.set_message("Fetching balance...");
 
     // Parse the address
-    let addr: Address = address.parse()
-        .context("Invalid EVM address")?;
+    let addr: Address = address.parse().context("Invalid EVM address")?;
 
     // Get the balance
     let balance = provider
@@ -167,8 +176,8 @@ pub async fn get_evm_balance(address: &str, endpoint: &str) -> Result<()> {
     println!();
 
     // Convert balance to ETH
-    let balance_eth = ethers::utils::format_units(balance, "ether")
-        .unwrap_or_else(|_| balance.to_string());
+    let balance_eth =
+        ethers::utils::format_units(balance, "ether").unwrap_or_else(|_| balance.to_string());
 
     println!("{}: {} ETH", "Balance".green().bold(), balance_eth);
     println!("{}: {} Wei", "Raw".dimmed(), balance);
@@ -208,7 +217,15 @@ pub async fn get_balance(address: &str, chain: &str, endpoint: &str) -> Result<(
         || endpoint.starts_with("wss://")
         || matches!(
             chain.to_lowercase().as_str(),
-            "polkadot" | "kusama" | "paseo" | "westend" | "moonbeam" | "astar" | "acala" | "phala" | "bifrost"
+            "polkadot"
+                | "kusama"
+                | "paseo"
+                | "westend"
+                | "moonbeam"
+                | "astar"
+                | "acala"
+                | "phala"
+                | "bifrost"
         );
 
     if is_substrate {
