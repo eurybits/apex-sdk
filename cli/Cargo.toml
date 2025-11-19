@@ -38,6 +38,7 @@ zeroize = "1.7"
 
 # Blockchain interaction
 subxt = { workspace = true }
+subxt-signer = { version = "0.44.0", features = ["sr25519"] }
 ethers = { workspace = true }
 
 # UX improvements

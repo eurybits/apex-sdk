@@ -23,35 +23,35 @@ pub fn generate_account(account_type: &str, name: Option<String>) -> Result<()> 
 fn generate_substrate_account(name: Option<String>) -> Result<()> {
     use ::rand::RngCore;
 
-    // generate random entropy (16 bytes = 128 bits = 12 words)
+    // Generate random entropy (16 bytes = 128 bits = 12 words)
     let mut entropy = [0u8; 16];
     ::rand::rng().fill_bytes(&mut entropy);
 
-    // generate mnemonic from entropy
-    let mnemonic =
-        bip39::Mnemonic::from_entropy(&entropy).context("Failed to generate mnemonic")?;
+    // Generate mnemonic from entropy
+    let mnemonic = bip39::Mnemonic::from_entropy(&entropy)
+        .context("Failed to generate mnemonic")?;
     let mnemonic_phrase = mnemonic.to_string();
 
-    // generate keypair from mnemonic
+    // Generate keypair from mnemonic
     let seed = mnemonic.to_seed("");
     let pair = sr25519::Pair::from_seed_slice(&seed[..32])
         .context("Failed to generate keypair from seed")?;
 
     let address = pair.public().to_ss58check();
 
-    // display the account information
+    // Display the account information
     println!("\n{}", "Substrate Account Generated".green().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
     println!("\n{}: {}", "Address".cyan().bold(), address);
     println!("\n{}: {}", "Mnemonic".yellow().bold(), mnemonic_phrase);
-    println!("\n{}", "  IMPORTANT SECURITY NOTICE".red().bold());
+    println!("\n{}", "IMPORTANT SECURITY NOTICE".red().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
     println!("• Write down your mnemonic phrase in a secure location");
     println!("• Never share your mnemonic with anyone");
     println!("• Store it offline in multiple secure locations");
     println!("• This mnemonic cannot be recovered if lost");
 
-    // ask if user wants to save the account
+    // Ask if user wants to save the account
     if let Some(account_name) = name {
         save_account_interactive(
             account_name,
@@ -60,7 +60,7 @@ fn generate_substrate_account(name: Option<String>) -> Result<()> {
             &mnemonic_phrase,
         )?;
     } else {
-        println!("\n{}", " Tip:".cyan());
+        println!("\n{}", "Tip:".cyan());
         println!(
             "Use {} to save this account for later use",
             "apex account import <mnemonic>".yellow()
@@ -72,41 +72,46 @@ fn generate_substrate_account(name: Option<String>) -> Result<()> {
 
 /// Generate an EVM account
 fn generate_evm_account(name: Option<String>) -> Result<()> {
-    use ::rand::RngCore;
     use ethers::prelude::*;
+    use ::rand::RngCore;
 
-    // generate random entropy (16 bytes = 128 bits = 12 words)
+    // Generate random entropy (16 bytes = 128 bits = 12 words)
     let mut entropy = [0u8; 16];
     ::rand::rng().fill_bytes(&mut entropy);
 
-    // generate mnemonic from entropy
-    let mnemonic =
-        bip39::Mnemonic::from_entropy(&entropy).context("Failed to generate mnemonic")?;
+    // Generate mnemonic from entropy
+    let mnemonic = bip39::Mnemonic::from_entropy(&entropy)
+        .context("Failed to generate mnemonic")?;
     let mnemonic_phrase = mnemonic.to_string();
 
-    // generate wallet from mnemonic
+    // Generate wallet from mnemonic
     let wallet_from_mnemonic = mnemonic_phrase
         .parse::<ethers::signers::Wallet<ethers::core::k256::ecdsa::SigningKey>>()
         .context("Failed to parse mnemonic")?;
     let address = format!("{:?}", wallet_from_mnemonic.address());
 
-    // display the account information
-    println!("\n{}", " EVM Account Generated".green().bold());
+    // Display the account information
+    println!("\n{}", "EVM Account Generated".green().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
     println!("\n{}: {}", "Address".cyan().bold(), address);
     println!("\n{}: {}", "Mnemonic".yellow().bold(), mnemonic_phrase);
-    println!("\n{}", "  IMPORTANT SECURITY NOTICE".red().bold());
+    println!("\n{}", "IMPORTANT SECURITY NOTICE".red().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
     println!("• Write down your mnemonic phrase in a secure location");
     println!("• Never share your mnemonic with anyone");
     println!("• Store it offline in multiple secure locations");
     println!("• This mnemonic cannot be recovered if lost");
 
-    // ask if user wants to save the account
+    // Ask if user wants to save the account
     if let Some(account_name) = name {
-        save_account_interactive(account_name, AccountType::Evm, address, &mnemonic_phrase)?;
+        save_account_interactive(
+            account_name,
+            AccountType::Evm,
+            address,
+            &mnemonic_phrase,
+        )?;
     } else {
-        println!("\n{}", " Tip:".cyan());
+        println!("\n{}", "Tip:".cyan());
         println!(
             "Use {} to save this account for later use",
             "apex account import <mnemonic>".yellow()
@@ -120,8 +125,9 @@ fn generate_evm_account(name: Option<String>) -> Result<()> {
 pub fn import_account(mnemonic: &str, account_type: &str, name: String) -> Result<()> {
     use ethers::signers::Signer;
 
-    // validate mnemonic
-    let mnemonic_obj: bip39::Mnemonic = mnemonic.parse().context("Invalid mnemonic phrase")?;
+    // Validate mnemonic
+    let mnemonic_obj: bip39::Mnemonic = mnemonic.parse()
+        .context("Invalid mnemonic phrase")?;
 
     match account_type.to_lowercase().as_str() {
         "substrate" | "sub" => {
@@ -156,10 +162,10 @@ fn save_account_interactive(
     address: String,
     mnemonic: &str,
 ) -> Result<()> {
-    println!("\n{}", " Saving Account to Keystore".cyan().bold());
+    println!("\n{}", "💾 Saving Account to Keystore".cyan().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
 
-    // get password
+    // Get password
     let password = rpassword::prompt_password("Enter password to encrypt account: ")
         .context("Failed to read password")?;
 
@@ -174,11 +180,11 @@ fn save_account_interactive(
         anyhow::bail!("Passwords do not match");
     }
 
-    // load keystore
+    // Load keystore
     let keystore_path = crate::keystore::get_keystore_path()?;
     let mut keystore = Keystore::load(&keystore_path)?;
 
-    // add account
+    // Add account
     keystore.add_account(
         name.clone(),
         account_type.clone(),
@@ -187,10 +193,10 @@ fn save_account_interactive(
         &password,
     )?;
 
-    // save keystore
+    // Save keystore
     keystore.save(&keystore_path)?;
 
-    println!("\n{}", " Account Saved Successfully".green().bold());
+    println!("\n{}", "Account Saved Successfully".green().bold());
     println!("{}: {}", "Name".cyan(), name);
     println!("{}: {}", "Type".cyan(), account_type);
     println!("{}: {}", "Address".cyan(), address);
@@ -208,13 +214,13 @@ pub fn list_accounts() -> Result<()> {
 
     if accounts.is_empty() {
         println!("\n{}", "No accounts found".yellow());
-        println!("\n{}", " Tip: Create an account:".cyan());
+        println!("\n{}", "Create an account:".cyan());
         println!("  apex account generate --type substrate");
         println!("  apex account generate --type evm");
         return Ok(());
     }
 
-    println!("\n{}", " Accounts".cyan().bold());
+    println!("\n{}", "Accounts".cyan().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
 
     for (idx, account) in accounts.iter().enumerate() {
@@ -222,13 +228,9 @@ pub fn list_accounts() -> Result<()> {
         println!("   {}: {}", "Type".dimmed(), account.account_type);
         println!("   {}: {}", "Address".dimmed(), account.address);
 
-        let created =
-            chrono::DateTime::from_timestamp(account.created_at as i64, 0).unwrap_or_default();
-        println!(
-            "   {}: {}",
-            "Created".dimmed(),
-            created.format("%Y-%m-%d %H:%M:%S")
-        );
+        let created = chrono::DateTime::from_timestamp(account.created_at as i64, 0)
+            .unwrap_or_default();
+        println!("   {}: {}", "Created".dimmed(), created.format("%Y-%m-%d %H:%M:%S"));
     }
 
     println!("\n{}: {}", "Total".cyan(), accounts.len());
@@ -246,20 +248,19 @@ pub fn export_account(name: &str) -> Result<()> {
         anyhow::bail!("Account '{}' not found", name);
     }
 
-    println!("\n{}", " Export Account".yellow().bold());
+    println!("\n{}", "🔓 Export Account".yellow().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
-    println!(
-        "{}",
-        "  Warning: This will display your secret mnemonic!".red()
-    );
+    println!("{}", "Warning: This will display your secret mnemonic!".red());
 
-    let password =
-        rpassword::prompt_password("Enter password: ").context("Failed to read password")?;
+    let password = rpassword::prompt_password("Enter password: ")
+        .context("Failed to read password")?;
+
     let mnemonic_bytes = keystore.get_account(name, &password)?;
-    let mnemonic = String::from_utf8(mnemonic_bytes).context("Failed to decode mnemonic")?;
+    let mnemonic = String::from_utf8(mnemonic_bytes)
+        .context("Failed to decode mnemonic")?;
 
     println!("\n{}: {}", "Mnemonic".yellow().bold(), mnemonic);
-    println!("\n{}", "  Security Reminder:".red().bold());
+    println!("\n{}", "Security Reminder:".red().bold());
     println!("• Never share this mnemonic with anyone");
     println!("• Clear your terminal history after viewing");
     println!("• Make sure no one is looking over your shoulder");
@@ -276,14 +277,11 @@ pub fn remove_account(name: &str) -> Result<()> {
         anyhow::bail!("Account '{}' not found", name);
     }
 
-    println!("\n{}", " Remove Account".red().bold());
+    println!("\n{}", "🗑️  Remove Account".red().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
-    println!("{}", " Warning: This action cannot be undone!".red());
+    println!("{}", "Warning: This action cannot be undone!".red());
 
-    print!(
-        "Are you sure you want to remove account '{}'? (yes/no): ",
-        name
-    );
+    print!("Are you sure you want to remove account '{}'? (yes/no): ", name);
     std::io::stdout().flush()?;
 
     let mut input = String::new();
@@ -297,7 +295,7 @@ pub fn remove_account(name: &str) -> Result<()> {
     keystore.remove_account(name)?;
     keystore.save(&keystore_path)?;
 
-    println!("\n{}", " Account removed successfully".green());
+    println!("\n{}", "Account removed successfully".green());
 
     Ok(())
 }
@@ -308,16 +306,15 @@ mod tests {
 
     #[test]
     fn test_generate_substrate_account() {
-        // this test just verifies the function doesn't panic
-        // we can't test interactive parts without mocking
+        // This test just verifies the function doesn't panic
+        // We can't test interactive parts without mocking
         let result = generate_substrate_account(None);
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_validate_mnemonic() {
-        let valid_mnemonic =
-            "legal winner thank year wave sausage worth useful legal winner thank yellow";
+        let valid_mnemonic = "legal winner thank year wave sausage worth useful legal winner thank yellow";
         let result: Result<bip39::Mnemonic, _> = valid_mnemonic.parse();
         assert!(result.is_ok());
 

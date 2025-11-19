@@ -43,22 +43,14 @@ pub fn generate_completions(shell: &str) -> Result<()> {
 
 /// Print installation instructions for shell completions
 pub fn print_install_instructions(shell: &str) {
-    println!(
-        "\n{}",
-        colored::Colorize::cyan("Shell Completion Installation:").bold()
-    );
-    println!(
-        "{}",
-        colored::Colorize::dimmed("═══════════════════════════════════════")
-    );
+    println!("\n{}", colored::Colorize::cyan("Shell Completion Installation:").bold());
+    println!("{}", colored::Colorize::dimmed("═══════════════════════════════════════"));
 
     match shell.to_lowercase().as_str() {
         "bash" => {
             println!("\n{}", colored::Colorize::yellow("For Bash:").bold());
             println!("  1. Generate completions:");
-            println!(
-                "     apex completions bash > ~/.local/share/bash-completion/completions/apex"
-            );
+            println!("     apex completions bash > ~/.local/share/bash-completion/completions/apex");
             println!("\n  2. Or add to your ~/.bashrc:");
             println!("     eval \"$(apex completions bash)\"");
             println!("\n  3. Reload your shell:");
@@ -107,17 +99,9 @@ pub fn print_install_instructions(shell: &str) {
 
     println!("\n{}", colored::Colorize::cyan("Quick Setup:").bold());
     println!("  Run this command and follow the instructions:");
-    println!(
-        "  apex completions {} | sudo tee /etc/bash_completion.d/apex",
-        shell
-    );
+    println!("  apex completions {} | sudo tee /etc/bash_completion.d/apex", shell);
 
-    println!(
-        "\n{}",
-        colored::Colorize::dimmed(
-            "After installation, you'll have tab completion for all apex commands!"
-        )
-    );
+    println!("\n{}", colored::Colorize::dimmed("After installation, you'll have tab completion for all apex commands!"));
 }
 
 #[cfg(test)]
@@ -129,12 +113,9 @@ mod tests {
         let shells = vec!["bash", "zsh", "fish", "powershell", "elvish"];
 
         for shell in shells {
-            // we can't actually test the generation without capturing stdout,..
+            // We can't actually test the generation without capturing stdout,
             // but we can verify the function doesn't panic
-            assert!(matches!(
-                shell,
-                "bash" | "zsh" | "fish" | "powershell" | "elvish"
-            ));
+            assert!(matches!(shell, "bash" | "zsh" | "fish" | "powershell" | "elvish"));
         }
     }
 

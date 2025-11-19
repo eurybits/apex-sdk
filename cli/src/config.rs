@@ -68,14 +68,20 @@ impl Default for Config {
             "moonbeam".to_string(),
             "wss://wss.api.moonbeam.network".to_string(),
         );
-        endpoints.insert("astar".to_string(), "wss://rpc.astar.network".to_string());
+        endpoints.insert(
+            "astar".to_string(),
+            "wss://rpc.astar.network".to_string(),
+        );
 
         // EVM chains
         endpoints.insert(
             "ethereum".to_string(),
             "https://eth.llamarpc.com".to_string(),
         );
-        endpoints.insert("polygon".to_string(), "https://polygon-rpc.com".to_string());
+        endpoints.insert(
+            "polygon".to_string(),
+            "https://polygon-rpc.com".to_string(),
+        );
         endpoints.insert(
             "sepolia".to_string(),
             "https://ethereum-sepolia-rpc.publicnode.com".to_string(),
@@ -95,9 +101,10 @@ impl Config {
     /// Load configuration from disk
     pub fn load(path: &Path) -> Result<Self> {
         if path.exists() {
-            let data = std::fs::read_to_string(path).context("Failed to read config file")?;
-            let config: Config =
-                serde_json::from_str(&data).context("Failed to parse config file")?;
+            let data = std::fs::read_to_string(path)
+                .context("Failed to read config file")?;
+            let config: Config = serde_json::from_str(&data)
+                .context("Failed to parse config file")?;
             Ok(config)
         } else {
             Ok(Self::default())
@@ -106,13 +113,15 @@ impl Config {
 
     /// Save configuration to disk
     pub fn save(&self, path: &Path) -> Result<()> {
-        // ensure parent directory exists
+        // Ensure parent directory exists
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
         }
 
-        let data = serde_json::to_string_pretty(self).context("Failed to serialize config")?;
-        std::fs::write(path, data).context("Failed to write config file")?;
+        let data = serde_json::to_string_pretty(self)
+            .context("Failed to serialize config")?;
+        std::fs::write(path, data)
+            .context("Failed to write config file")?;
 
         Ok(())
     }
@@ -121,7 +130,7 @@ impl Config {
     pub fn validate(&self) -> Result<Vec<String>> {
         let mut warnings = Vec::new();
 
-        // check if default chain has an endpoint
+        // Check if default chain has an endpoint
         if !self.endpoints.contains_key(&self.default_chain) {
             warnings.push(format!(
                 "Default chain '{}' has no endpoint defined",
@@ -129,7 +138,7 @@ impl Config {
             ));
         }
 
-        // validate endpoint URLs
+        // Validate endpoint URLs
         for (chain, endpoint) in &self.endpoints {
             if !endpoint.starts_with("wss://")
                 && !endpoint.starts_with("ws://")
@@ -143,7 +152,7 @@ impl Config {
             }
         }
 
-        // validate log level
+        // Validate log level
         let valid_levels = ["trace", "debug", "info", "warn", "error"];
         if !valid_levels.contains(&self.preferences.log_level.as_str()) {
             warnings.push(format!(
@@ -168,21 +177,17 @@ impl Config {
                 self.default_account = Some(value.to_string());
             }
             "preferences.color_output" => {
-                self.preferences.color_output = value
-                    .parse()
+                self.preferences.color_output = value.parse()
                     .context("Invalid boolean value for color_output")?;
             }
             "preferences.progress_bars" => {
-                self.preferences.progress_bars = value
-                    .parse()
+                self.preferences.progress_bars = value.parse()
                     .context("Invalid boolean value for progress_bars")?;
             }
             "preferences.log_level" => {
                 let valid_levels = ["trace", "debug", "info", "warn", "error"];
                 if !valid_levels.contains(&value) {
-                    anyhow::bail!(
-                        "Invalid log level. Valid levels: trace, debug, info, warn, error"
-                    );
+                    anyhow::bail!("Invalid log level. Valid levels: trace, debug, info, warn, error");
                 }
                 self.preferences.log_level = value.to_string();
             }
@@ -202,10 +207,7 @@ impl Config {
         match key {
             "default_chain" => Ok(self.default_chain.clone()),
             "default_endpoint" => Ok(self.default_endpoint.clone()),
-            "default_account" => Ok(self
-                .default_account
-                .clone()
-                .unwrap_or_else(|| "none".to_string())),
+            "default_account" => Ok(self.default_account.clone().unwrap_or_else(|| "none".to_string())),
             "preferences.color_output" => Ok(self.preferences.color_output.to_string()),
             "preferences.progress_bars" => Ok(self.preferences.progress_bars.to_string()),
             "preferences.log_level" => Ok(self.preferences.log_level.clone()),
@@ -276,9 +278,7 @@ mod tests {
     fn test_config_set_endpoint() {
         let mut config = Config::default();
 
-        config
-            .set("endpoints.testnet", "wss://testnet.example.com")
-            .unwrap();
+        config.set("endpoints.testnet", "wss://testnet.example.com").unwrap();
         assert_eq!(
             config.get("endpoints.testnet").unwrap(),
             "wss://testnet.example.com"
@@ -289,14 +289,14 @@ mod tests {
     fn test_config_validation() {
         let mut config = Config::default();
 
-        // should have no warnings with default config
+        // Should have no warnings with default config
         let warnings = config.validate().unwrap();
         assert_eq!(warnings.len(), 0);
 
-        // invalid log level should produce warning
+        // Invalid log level should produce warning
         config.preferences.log_level = "invalid".to_string();
         let warnings = config.validate().unwrap();
-        assert!(!warnings.is_empty());
+        assert!(warnings.len() > 0);
     }
 
     #[test]

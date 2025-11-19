@@ -203,14 +203,14 @@ async fn main() -> anyhow::Result<()> {
             print_success_message(&name, &template);
         }
         Commands::Build { release } => {
-            println!("Building project...");
+            println!("🔨 Building project...");
             build_project(release).await?;
             println!("Build completed!");
         }
         Commands::Test { filter } => {
-            println!("  Running tests...");
+            println!("🧪 Running tests...");
             run_tests(filter).await?;
-            println!("  Tests passed!");
+            println!("Tests passed!");
         }
         Commands::Deploy {
             contract,
@@ -220,15 +220,15 @@ async fn main() -> anyhow::Result<()> {
             dry_run,
         } => {
             if dry_run {
-                println!("  Dry-run mode: Simulating deployment without broadcasting...");
+                println!("Dry-run mode: Simulating deployment without broadcasting...");
             } else {
-                println!("  Deploying contract...");
+                println!("Deploying contract...");
             }
             deploy::deploy_contract(&contract, &chain, &endpoint, account, dry_run).await?;
         }
         Commands::Account { action } => match action {
             AccountCommands::Generate { account_type, name } => {
-                println!("  Generating new {} account...", account_type);
+                println!("🔑 Generating new {} account...", account_type);
                 account::generate_account(&account_type, name)?;
             }
             AccountCommands::Import {
@@ -236,7 +236,7 @@ async fn main() -> anyhow::Result<()> {
                 account_type,
                 name,
             } => {
-                println!("  Importing {} account...", account_type);
+                println!("📥 Importing {} account...", account_type);
                 account::import_account(&mnemonic, &account_type, name)?;
             }
             AccountCommands::List => {
@@ -278,15 +278,15 @@ async fn main() -> anyhow::Result<()> {
         },
         Commands::Chain { action } => match action {
             ChainCommands::List => {
-                println!("  Supported chains:");
+                println!("Supported chains:");
                 list_chains();
             }
             ChainCommands::Info { chain, endpoint } => {
-                println!("  Fetching chain info for {}...", chain);
+                println!("ℹ️  Fetching chain info for {}...", chain);
                 get_chain_info(&chain, &endpoint).await?;
             }
             ChainCommands::Health { endpoint } => {
-                println!("  Checking chain health...");
+                println!("🏥 Checking chain health...");
                 check_chain_health(&endpoint).await?;
             }
         },
@@ -296,21 +296,21 @@ async fn main() -> anyhow::Result<()> {
             completions::print_install_instructions(&shell);
         }
         Commands::Init { interactive } => {
-            eprintln!("  Note: 'apex init' is deprecated. Use 'apex config init' instead.\n");
+            eprintln!("Note: 'apex init' is deprecated. Use 'apex config init' instead.\n");
             if interactive {
                 config_cmd::init_config_interactive().await?;
             } else {
                 let config_path = config::get_config_path()?;
                 let config = config::Config::default();
                 config.save(&config_path)?;
-                println!("  Configuration initialized at: {}", config_path.display());
-                println!("  Use 'apex config init' for interactive setup");
+                println!("Configuration initialized at: {}", config_path.display());
+                println!("Use 'apex config init' for interactive setup");
             }
         }
         Commands::Bench { filter } => {
-            println!("  Running benchmarks...");
+            println!("📊 Running benchmarks...");
             run_benchmarks(filter).await?;
-            println!("  Benchmarks completed!");
+            println!("Benchmarks completed!");
         }
         Commands::Version => {
             println!("Apex SDK CLI v{}", env!("CARGO_PKG_VERSION"));
@@ -329,15 +329,15 @@ fn print_apex_banner() {
         r#"
     ╔═══════════════════════════════════════════════════════════════════╗
     ║                                                                   ║
-    ║      █████╗ ██████╗ ███████╗██╗  ██╗    ███████╗██████╗ ██╗  ██╗  ║
-    ║     ██╔══██╗██╔══██╗██╔════╝╚██╗██╔╝    ██╔════╝██╔══██╗██║ ██╔╝  ║
-    ║     ███████║██████╔╝█████╗   ╚███╔╝     ███████╗██║  ██║█████╔╝   ║
-    ║     ██╔══██║██╔═══╝ ██╔══╝   ██╔██╗     ╚════██║██║  ██║██╔═██╗   ║
-    ║     ██║  ██║██║     ███████╗██╔╝ ██╗    ███████║██████╔╝██║  ██╗  ║
-    ║     ╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝    ╚══════╝╚═════╝ ╚═╝  ╚═╝  ║
+    ║      █████╗ ██████╗ ███████╗██╗  ██╗    ███████╗██████╗ ██╗  ██╗ ║
+    ║     ██╔══██╗██╔══██╗██╔════╝╚██╗██╔╝    ██╔════╝██╔══██╗██║ ██╔╝ ║
+    ║     ███████║██████╔╝█████╗   ╚███╔╝     ███████╗██║  ██║█████╔╝  ║
+    ║     ██╔══██║██╔═══╝ ██╔══╝   ██╔██╗     ╚════██║██║  ██║██╔═██╗  ║
+    ║     ██║  ██║██║     ███████╗██╔╝ ██╗    ███████║██████╔╝██║  ██╗ ║
+    ║     ╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝    ╚══════╝╚═════╝ ╚═╝  ╚═╝ ║
     ║                                                                   ║
-    ║           Unified Rust SDK for Substrate & EVM Chains             ║
-    ║                    Cross-Chain Made Simple                        ║
+    ║           Unified Rust SDK for Substrate & EVM Chains            ║
+    ║                    Cross-Chain Made Simple                       ║
     ║                                                                   ║
     ╚═══════════════════════════════════════════════════════════════════╝
 "#
@@ -439,13 +439,13 @@ This project demonstrates cross-chain blockchain development using the Apex SDK.
 
 ## Features
 
-- Substrate & EVM support
-- Type-safe blockchain interactions
-- Built-in connection pooling
-- Automatic retry logic
-- Comprehensive error handling
+-Substrate & EVM support
+-Type-safe blockchain interactions
+-Built-in connection pooling
+-Automatic retry logic
+-Comprehensive error handling
 
-## Getting Started
+## 🛠️ Getting Started
 
 ### Prerequisites
 
@@ -474,27 +474,28 @@ cargo test
 cargo run --example quickstart
 ```
 
-## Documentation
+## 📖 Documentation
 
 - [Apex SDK Documentation](https://github.com/kherldhussein/apex-sdk)
 - [API Reference](https://docs.rs/apex-sdk)
 - [Examples](./examples/)
 
-## Configuration
+## 🔧 Configuration
 
 Edit `src/main.rs` to customize:
 - RPC endpoints
 - Chain selection
 - Transaction parameters
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
+## 📄 License
+
 This project is licensed under MIT OR Apache-2.0
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 Built with [Apex SDK](https://github.com/kherldhussein/apex-sdk) - Unified Rust SDK for Substrate & EVM chains.
 "#,
@@ -606,7 +607,7 @@ async fn main() -> Result<()> {
     // Initialize tracing
     tracing_subscriber::fmt::init();
 
-    println!("Apex SDK NFT Quickstart Example\n");
+    println!("🎨 Apex SDK NFT Quickstart Example\n");
 
     // Your NFT logic here
 
@@ -626,7 +627,7 @@ async fn main() -> Result<()> {
     // Initialize tracing
     tracing_subscriber::fmt::init();
 
-    println!("Apex SDK Cross-Chain Quickstart Example\n");
+    println!("⚡ Apex SDK Cross-Chain Quickstart Example\n");
 
     // Connect to Polkadot
     println!("Connecting to Polkadot...");
@@ -651,7 +652,7 @@ fn print_success_message(name: &str, template: &str) {
 ║                                                                   ║
 ╚═══════════════════════════════════════════════════════════════════╝
 
-📦 Project: {}
+Project: {}
 🎨 Template: {}
 
 📁 Project Structure:
@@ -668,7 +669,7 @@ fn print_success_message(name: &str, template: &str) {
    └── 📂 .vscode/
        └── 📄 settings.json   (VS Code settings)
 
-🚀 Next Steps:
+Next Steps:
 
    1️⃣  Navigate to your project:
        cd {}
@@ -685,7 +686,7 @@ fn print_success_message(name: &str, template: &str) {
    5️⃣  Read the docs:
        cargo doc --open
 
-💡 Useful Commands:
+Useful Commands:
 
    • cargo test              Run tests
    • cargo clippy            Lint your code
@@ -698,19 +699,15 @@ fn print_success_message(name: &str, template: &str) {
    • API Reference:    https://docs.rs/apex-sdk
    • CLI Guide:        apex --help
 
-Happy coding! 🎉
-
+Happy coding!
 "#,
         name, template, name, name
     );
 }
 
 async fn build_project(release: bool) -> anyhow::Result<()> {
-    println!(
-        "   🔨 Building project{}...",
-        if release { " (release mode)" } else { "" }
-    );
-    println!("   ⏳ This may take a while on first build...\n");
+    println!("   🔨 Building project{}...", if release { " (release mode)" } else { "" });
+    println!("   This may take a while on first build...\n");
 
     let mut cmd = std::process::Command::new("cargo");
     cmd.arg("build");
@@ -722,9 +719,9 @@ async fn build_project(release: bool) -> anyhow::Result<()> {
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         anyhow::bail!(
-            "\n❌ Build failed!\n\n\
+            "\nBuild failed!\n\n\
             Error details:\n{}\n\n\
-            💡 Common fixes:\n\
+            Common fixes:\n\
             • Run 'cargo clean' to clear build cache\n\
             • Update dependencies with 'cargo update'\n\
             • Check for compilation errors above\n\
@@ -733,11 +730,11 @@ async fn build_project(release: bool) -> anyhow::Result<()> {
         );
     }
 
-    println!("   ✅ Build completed successfully!");
+    println!("Build completed successfully!");
     if release {
-        println!("   📦 Binary available in ./target/release/");
+        println!("   Binary available in ./target/release/");
     } else {
-        println!("   📦 Binary available in ./target/debug/");
+        println!("   Binary available in ./target/debug/");
     }
     Ok(())
 }
@@ -748,7 +745,7 @@ async fn run_tests(filter: Option<String>) -> anyhow::Result<()> {
     } else {
         println!("   🧪 Running all tests...");
     }
-    println!("   ⏳ Please wait...\n");
+    println!("   Please wait...\n");
 
     let mut cmd = std::process::Command::new("cargo");
     cmd.arg("test");
@@ -760,9 +757,9 @@ async fn run_tests(filter: Option<String>) -> anyhow::Result<()> {
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         anyhow::bail!(
-            "\n❌ Tests failed!\n\n\
+            "\nTests failed!\n\n\
             Error details:\n{}\n\n\
-            💡 Troubleshooting:\n\
+            Troubleshooting:\n\
             • Review the test output above for specific failures\n\
             • Run tests individually: cargo test <test_name>\n\
             • Run with output: cargo test -- --nocapture\n\
@@ -771,9 +768,10 @@ async fn run_tests(filter: Option<String>) -> anyhow::Result<()> {
         );
     }
 
-    println!("   ✅ All tests passed!");
+    println!("All tests passed!");
     Ok(())
 }
+
 
 fn list_chains() {
     println!("\n   Substrate Mainnets:");
@@ -803,13 +801,13 @@ fn list_chains() {
     println!("\n   EVM Testnets:");
     println!("     • sepolia     - Ethereum Sepolia");
 
-    println!("\n   💡 Use 'apex config show' to see configured endpoints");
+    println!("\n   Use 'apex config show' to see configured endpoints");
 }
 
 async fn get_chain_info(chain: &str, endpoint: &str) -> anyhow::Result<()> {
     use colored::Colorize;
 
-    println!("\n{}", "🔗 Chain Information".cyan().bold());
+    println!("\n{}", "Chain Information".cyan().bold());
     println!("{}", "═══════════════════════════════════════".dimmed());
     println!("{}: {}", "Chain".dimmed(), chain);
     println!("{}: {}", "Endpoint".dimmed(), endpoint);
@@ -848,22 +846,15 @@ async fn get_chain_info(chain: &str, endpoint: &str) -> anyhow::Result<()> {
         println!();
 
         println!("{}", "Runtime:".yellow().bold());
-        println!(
-            "  {}: {}",
-            "Spec Version".cyan(),
-            runtime_version.spec_version
-        );
-        println!(
-            "  {}: {}",
-            "Transaction Version".dimmed(),
-            runtime_version.transaction_version
-        );
+        println!("  {}: {}", "Spec Version".cyan(), runtime_version.spec_version);
+        println!("  {}: {}", "Transaction Version".dimmed(), runtime_version.transaction_version);
+
     } else {
         // EVM chain info
         use ethers::prelude::*;
 
-        let provider =
-            Provider::<Http>::try_from(endpoint).context("Failed to create EVM provider")?;
+        let provider = Provider::<Http>::try_from(endpoint)
+            .context("Failed to create EVM provider")?;
 
         spinner.set_message("Fetching chain data...");
 
@@ -874,10 +865,9 @@ async fn get_chain_info(chain: &str, endpoint: &str) -> anyhow::Result<()> {
         let block_number = provider.get_block_number().await?;
 
         // Get latest block
-        let block = provider
-            .get_block(block_number)
-            .await?
-            .ok_or_else(|| anyhow::anyhow!("Failed to fetch latest block"))?;
+        let block = provider.get_block(block_number).await?.ok_or_else(|| {
+            anyhow::anyhow!("Failed to fetch latest block")
+        })?;
 
         // Get network version
         let network_version = provider.get_net_version().await?;
@@ -888,22 +878,14 @@ async fn get_chain_info(chain: &str, endpoint: &str) -> anyhow::Result<()> {
         println!("  {}: {}", "Chain ID".cyan(), chain_id);
         println!("  {}: {}", "Network Version".dimmed(), network_version);
         println!("  {}: {}", "Block Height".cyan(), block_number);
-        println!(
-            "  {}: {:?}",
-            "Block Hash".dimmed(),
-            block.hash.unwrap_or_default()
-        );
+        println!("  {}: {:?}", "Block Hash".dimmed(), block.hash.unwrap_or_default());
         println!();
 
         println!("{}", "Block Details:".yellow().bold());
         println!("  {}: {}", "Timestamp".dimmed(), block.timestamp);
         println!("  {}: {}", "Gas Limit".dimmed(), block.gas_limit);
         println!("  {}: {}", "Gas Used".dimmed(), block.gas_used);
-        println!(
-            "  {}: {}",
-            "Transactions".dimmed(),
-            block.transactions.len()
-        );
+        println!("  {}: {}", "Transactions".dimmed(), block.transactions.len());
 
         // Determine network name from chain ID
         let network_name = match chain_id.as_u64() {
@@ -958,19 +940,20 @@ async fn check_chain_health(endpoint: &str) -> anyhow::Result<()> {
 
         spinner.finish_and_clear();
 
-        println!("{}", "✅ Connection Successful".green().bold());
+        println!("{}", "Connection Successful".green().bold());
         println!();
         println!("{}", "Health Metrics:".yellow().bold());
         println!("  {}: {}ms", "Latency".cyan(), latency.as_millis());
         println!("  {}: {}", "Latest Block".dimmed(), block.number());
         println!("  {}: Healthy", "Status".green().bold());
+
     } else {
         // EVM health check
         use ethers::prelude::*;
 
         let start = Instant::now();
-        let provider =
-            Provider::<Http>::try_from(endpoint).context("Failed to create EVM provider")?;
+        let provider = Provider::<Http>::try_from(endpoint)
+            .context("Failed to create EVM provider")?;
 
         spinner.set_message("Fetching chain data...");
 
@@ -984,7 +967,7 @@ async fn check_chain_health(endpoint: &str) -> anyhow::Result<()> {
 
         spinner.finish_and_clear();
 
-        println!("{}", "✅ Connection Successful".green().bold());
+        println!("{}", "Connection Successful".green().bold());
         println!();
         println!("{}", "Health Metrics:".yellow().bold());
         println!("  {}: {}ms", "Latency".cyan(), latency.as_millis());
@@ -995,6 +978,7 @@ async fn check_chain_health(endpoint: &str) -> anyhow::Result<()> {
 
     Ok(())
 }
+
 
 async fn run_benchmarks(filter: Option<String>) -> anyhow::Result<()> {
     let mut cmd = std::process::Command::new("cargo");
