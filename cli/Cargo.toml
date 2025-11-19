@@ -4,7 +4,12 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
-description = "CLI tool for Apex SDK"
+repository.workspace = true
+homepage.workspace = true
+description = "CLI tool for Apex SDK - unified Rust SDK for Substrate & EVM blockchain development"
+readme = "README.md"
+keywords = ["blockchain", "cli", "substrate", "ethereum", "sdk"]
+categories = ["command-line-utilities", "development-tools"]
 
 [package.metadata.cargo-udeps.ignore]
 normal = ["apex-sdk", "tracing"]
@@ -14,7 +19,7 @@ name = "apex"
 path = "src/main.rs"
 
 [dependencies]
-apex-sdk = { path = "../apex-sdk", version = "0.1.0" }
+apex-sdk = { path = "../apex-sdk", version = "0.1.3" }
 tokio = { workspace = true }
 anyhow = { workspace = true }
 clap = { version = "4.4", features = ["derive"] }
