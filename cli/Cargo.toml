@@ -26,7 +26,6 @@ serde_json = { workspace = true }
 
 # Cryptography & Key Management
 sp-core = { workspace = true }
-sp-keyring = "44.0.0"
 bip39 = "2.0"
 rand = { workspace = true }
 hex = { workspace = true }
