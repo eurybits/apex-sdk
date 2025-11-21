@@ -76,13 +76,11 @@ impl Wallet {
     }
 
     /// Create wallet from mnemonic phrase
-    #[allow(clippy::result_large_err)]
     pub fn from_mnemonic(mnemonic: &str, key_type: KeyPairType) -> Result<Self> {
         Self::from_mnemonic_with_path(mnemonic, None, key_type)
     }
 
     /// Create wallet from mnemonic phrase with derivation path
-    #[allow(clippy::result_large_err)]
     pub fn from_mnemonic_with_path(
         mnemonic: &str,
         path: Option<&str>,
@@ -128,7 +126,6 @@ impl Wallet {
     }
 
     /// Create wallet from private key (seed)
-    #[allow(clippy::result_large_err)]
     pub fn from_seed(seed: &[u8], key_type: KeyPairType) -> Result<Self> {
         info!("Creating wallet from seed with {:?} keys", key_type);
 
