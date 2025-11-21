@@ -1,6 +1,6 @@
 # Apex SDK API Reference
 
-Complete API reference for Apex SDK v0.1.0
+Complete API reference for Apex SDK v0.1.3
 
 ## Table of Contents
 
@@ -663,4 +663,4 @@ Currently, Apex SDK does not use feature flags. All functionality is available b
 ---
 
 **Last Updated**: 2025-11-01
-**Version**: 0.1.0
+**Version**: 0.1.3

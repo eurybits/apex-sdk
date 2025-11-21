@@ -16,7 +16,7 @@ Add Apex SDK to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-apex-sdk = "0.1.0"
+apex-sdk = "0.1.3"
 tokio = { version = "1.35", features = ["full"] }
 anyhow = "1.0"
 ```
