@@ -24,7 +24,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-apex-sdk-core = "0.1.2"
+apex-sdk-core = "0.1.3"
 tokio = { version = "1.0", features = ["full"] }
 ```
 

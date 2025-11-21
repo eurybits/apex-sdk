@@ -27,7 +27,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-apex-sdk = "0.1.2"
+apex-sdk = "0.1.3"
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -280,23 +280,12 @@ export TEST_MNEMONIC="abandon abandon abandon abandon abandon abandon abandon ab
 
 ## Examples
 
-Comprehensive examples are available in the [`examples/`](examples/) directory:
+Comprehensive examples are available in the [`examples/`](../examples/) directory:
 
-### Basic Operations
-- [**Basic Transfer**](examples/basic-transfer/) - Simple token transfers
-- [**Balance Queries**](examples/balance-queries/) - Account balance checking
-- [**Transaction Building**](examples/transaction-building/) - Custom transaction creation
-
-### Advanced Features  
-- [**Cross-Chain Bridge**](examples/cross-chain-bridge/) - Asset transfers between chains
-- [**DeFi Aggregator**](examples/defi-aggregator/) - Multi-protocol DeFi interactions
-- [**DAO Governance**](examples/dao-governance/) - Decentralized governance participation
-- [**NFT Operations**](examples/nft-operations/) - NFT minting, trading, and management
-
-### Smart Contracts
-- [**Contract Deployment**](examples/contract-deployment/) - Smart contract deployment
-- [**Contract Interaction**](examples/contract-interaction/) - Method calls and events
-- [**ink! Contracts**](examples/ink-contracts/) - Substrate smart contracts
+- [**Account Manager**](../examples/account-manager/) - Multi-chain account management
+- [**Price Oracle**](../examples/price-oracle/) - Cross-chain price aggregation
+- [**Contract Orchestration**](../examples/contract-orchestration/) - Smart contract deployment
+- [**Parachain Assets**](../examples/parachain-assets/) - Parachain asset management
 
 ## Configuration
 
@@ -304,11 +293,11 @@ Comprehensive examples are available in the [`examples/`](examples/) directory:
 
 ```toml
 [dependencies]
-apex-sdk = { version = "0.1.2", features = ["full"] }
+apex-sdk = { version = "0.1.3", features = ["full"] }
 
 # Or choose specific features
-apex-sdk = { 
-    version = "0.1", 
+apex-sdk = {
+    version = "0.1.3", 
     features = [
         "evm",           # EVM support
         "substrate",     # Substrate support  
@@ -419,9 +408,6 @@ cargo fmt
 cargo clippy -- -D warnings
 ```
 
-### Code of Conduct
-
-Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 
 ## License
 

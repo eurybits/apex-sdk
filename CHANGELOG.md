@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2025-01-19
+
+### Added
+- Enhanced CLI commands for account and configuration management
+- Interactive configuration initialization with `apex config init`
+- Shell completions support (bash, zsh, fish, powershell)
+- Project templates (default, defi, nft)
+- Account generation and management commands
+- Configuration show/set/get/validate/reset commands
+- CLI README documentation
+
+### Changed
+- Improved CLI output messages for consistency and clarity
+- Refactored keystore implementation for better readability
+- Updated command structure with better organization
+- Enhanced package metadata for crates.io
+
+### Fixed
+- Clippy warnings for needless borrows and assertions
+- Code formatting and style improvements
+
 ## [0.1.2] - 2025-11-16
 
 ### Added
