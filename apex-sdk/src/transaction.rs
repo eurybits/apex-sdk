@@ -3,6 +3,7 @@
 use crate::error::{Error, Result};
 use apex_sdk_types::{Address, Chain, TransactionStatus};
 use serde::{Deserialize, Serialize};
+use sha3::{Digest, Keccak256};
 
 /// Transaction builder for creating cross-chain transactions
 pub struct TransactionBuilder {
@@ -90,7 +91,6 @@ impl TransactionBuilder {
     }
 
     /// Build the transaction
-    #[allow(clippy::result_large_err)]
     pub fn build(self) -> Result<Transaction> {
         let from = self
             .from
@@ -156,11 +156,27 @@ impl Transaction {
         self.source_chain != self.destination_chain
     }
 
-    /// Get transaction hash (placeholder for actual implementation)
+    /// Get transaction hash using Keccak256
     pub fn hash(&self) -> String {
-        // Simple hash based on sender/receiver addresses
-        let data = format!("{}{}{}", self.from.as_str(), self.to.as_str(), self.amount);
-        format!("0x{}", hex::encode(&data.as_bytes()[..32.min(data.len())]))
+        let mut hasher = Keccak256::new();
+
+        // Hash transaction data: from, to, amount, chains, data, gas_limit
+        hasher.update(self.from.as_str().as_bytes());
+        hasher.update(self.to.as_str().as_bytes());
+        hasher.update(self.amount.to_le_bytes());
+        hasher.update(format!("{:?}", self.source_chain).as_bytes());
+        hasher.update(format!("{:?}", self.destination_chain).as_bytes());
+
+        if let Some(ref data) = self.data {
+            hasher.update(data);
+        }
+
+        if let Some(gas_limit) = self.gas_limit {
+            hasher.update(gas_limit.to_le_bytes());
+        }
+
+        let result = hasher.finalize();
+        format!("0x{}", hex::encode(result))
     }
 }
 
