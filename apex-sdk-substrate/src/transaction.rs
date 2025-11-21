@@ -592,7 +592,6 @@ impl ExtrinsicBuilder {
     }
 
     /// Build the dynamic transaction payload
-    #[allow(clippy::result_large_err)]
     pub fn build(self) -> Result<impl subxt::tx::Payload> {
         let pallet = self
             .pallet
