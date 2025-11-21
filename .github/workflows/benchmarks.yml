@@ -74,6 +74,7 @@ jobs:
         run: |
           git fetch origin gh-pages:gh-pages || {
             echo "gh-pages branch does not exist, creating it..."
+            CURRENT_BRANCH=$(git branch --show-current)
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git checkout --orphan gh-pages
@@ -82,7 +83,7 @@ jobs:
             git add .
             git commit --allow-empty -m "Initialize gh-pages branch for benchmarks"
             git push origin gh-pages
-            git checkout -
+            git checkout "$CURRENT_BRANCH"
           }
 
       - name: Store benchmark result
