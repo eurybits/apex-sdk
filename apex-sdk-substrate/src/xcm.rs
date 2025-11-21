@@ -255,7 +255,6 @@ impl Default for WeightLimit {
 #[derive(Debug, Clone, Default)]
 pub struct XcmConfig {
     /// XCM version to use
-    #[allow(clippy::derivable_impls)]
     pub version: XcmVersion,
     /// Weight limit for execution
     pub weight_limit: WeightLimit,
@@ -421,7 +420,6 @@ impl XcmExecutor {
 
     // Helper methods for encoding XCM types
 
-    #[allow(clippy::result_large_err)]
     fn encode_multilocation(&self, location: &MultiLocation) -> Result<subxt::dynamic::Value> {
         // Encode MultiLocation as composite value
         // Structure: { parents: u8, interior: Junctions }
@@ -437,7 +435,6 @@ impl XcmExecutor {
         ]))
     }
 
-    #[allow(clippy::result_large_err)]
     fn encode_junctions(&self, junctions: &[Junction]) -> Result<subxt::dynamic::Value> {
         if junctions.is_empty() {
             // X0 (Here) variant
@@ -469,7 +466,6 @@ impl XcmExecutor {
         ))
     }
 
-    #[allow(clippy::result_large_err)]
     fn encode_junction(&self, junction: &Junction) -> Result<subxt::dynamic::Value> {
         match junction {
             Junction::Parachain(id) => Ok(subxt::dynamic::Value::unnamed_variant(
@@ -516,7 +512,6 @@ impl XcmExecutor {
         }
     }
 
-    #[allow(clippy::result_large_err)]
     fn encode_assets(&self, assets: &[XcmAsset]) -> Result<subxt::dynamic::Value> {
         let encoded_assets: Vec<subxt::dynamic::Value> = assets
             .iter()
@@ -557,7 +552,6 @@ impl XcmExecutor {
         ))
     }
 
-    #[allow(clippy::result_large_err)]
     fn encode_weight_limit(&self) -> Result<subxt::dynamic::Value> {
         match self.config.weight_limit {
             WeightLimit::Unlimited => {
