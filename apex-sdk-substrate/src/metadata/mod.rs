@@ -9,7 +9,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! apex-sdk-substrate = { version = "0.1.2", features = ["typed-westend"] }
+//! apex-sdk-substrate = { version = "0.1.3", features = ["typed-westend"] }
 //! ```
 //!
 //! Then use the generated types:
