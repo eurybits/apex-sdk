@@ -140,7 +140,6 @@ impl StorageClient {
     }
 
     /// Get a runtime constant (returns raw bytes)
-    #[allow(clippy::result_large_err)]
     pub fn get_constant(&self, pallet: &str, constant: &str) -> Result<Vec<u8>> {
         debug!("Getting constant: {}::{}", pallet, constant);
         self.metrics.record_storage_query();
@@ -157,14 +156,13 @@ impl StorageClient {
     }
 
     /// Get the existential deposit (minimum balance to keep account alive)
-    #[allow(clippy::result_large_err)]
     pub fn get_existential_deposit(&self) -> Result<u128> {
-        let _value = self.get_constant("Balances", "ExistentialDeposit")?;
+        let value = self.get_constant("Balances", "ExistentialDeposit")?;
 
-        // Try to extract as u128
-        // For now, return a default value
-        // TODO: Properly decode the constant value
-        Ok(10_000_000_000) // 10 DOT in Planck
+        // Decode the constant value as u128 (SCALE encoded)
+        decode_u128_from_bytes(&value).ok_or_else(|| {
+            Error::Storage("Failed to decode ExistentialDeposit as u128".to_string())
+        })
     }
 
     /// Query storage at a specific block hash
@@ -236,7 +234,6 @@ impl StorageClient {
     }
 
     /// Get metadata about a pallet
-    #[allow(clippy::result_large_err)]
     pub fn get_pallet_metadata(&self, pallet: &str) -> Result<PalletMetadata> {
         debug!("Getting pallet metadata: {}", pallet);
 
@@ -374,7 +371,6 @@ impl StorageQuery {
 }
 
 // Helper function for parsing block hash from hex string
-#[allow(clippy::result_large_err)]
 fn parse_block_hash(hash_hex: &str) -> Result<subxt::config::substrate::H256> {
     use subxt::config::substrate::H256;
 
@@ -415,6 +411,72 @@ fn extract_u128<T>(value: &subxt::dynamic::Value<T>, path: &[&str]) -> Option<u1
     }
 
     current.as_u128()
+}
+
+/// Decode a u128 value from SCALE-encoded bytes
+fn decode_u128_from_bytes(bytes: &[u8]) -> Option<u128> {
+    if bytes.is_empty() {
+        return None;
+    }
+
+    // SCALE encoding for u128 uses compact encoding for small values
+    // or fixed 16 bytes for larger values
+    match bytes.len() {
+        // Single byte: value 0-63 (compact)
+        1 => {
+            let byte = bytes[0];
+            if byte & 0b11 == 0b00 {
+                Some((byte >> 2) as u128)
+            } else {
+                None
+            }
+        }
+        // Two bytes: value 64-16383 (compact)
+        2 => {
+            if bytes[0] & 0b11 == 0b01 {
+                let value = u16::from_le_bytes([bytes[0], bytes[1]]);
+                Some((value >> 2) as u128)
+            } else {
+                None
+            }
+        }
+        // Four bytes: value 16384-1073741823 (compact)
+        4 => {
+            if bytes[0] & 0b11 == 0b10 {
+                let value = u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
+                Some((value >> 2) as u128)
+            } else {
+                // Try as fixed u32
+                Some(u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]) as u128)
+            }
+        }
+        // Eight bytes: fixed u64
+        8 => {
+            let mut arr = [0u8; 8];
+            arr.copy_from_slice(bytes);
+            Some(u64::from_le_bytes(arr) as u128)
+        }
+        // Sixteen bytes: fixed u128
+        16 => {
+            let mut arr = [0u8; 16];
+            arr.copy_from_slice(bytes);
+            Some(u128::from_le_bytes(arr))
+        }
+        // Variable length compact encoding (5+ bytes)
+        len if len >= 5 && bytes[0] & 0b11 == 0b11 => {
+            let byte_count = ((bytes[0] >> 2) + 4) as usize;
+            if len > byte_count {
+                let value_bytes = &bytes[1..byte_count + 1];
+                let mut arr = [0u8; 16];
+                let copy_len = value_bytes.len().min(16);
+                arr[..copy_len].copy_from_slice(&value_bytes[..copy_len]);
+                Some(u128::from_le_bytes(arr))
+            } else {
+                None
+            }
+        }
+        _ => None,
+    }
 }
 
 #[cfg(test)]
