@@ -74,6 +74,8 @@ jobs:
         run: |
           git fetch origin gh-pages:gh-pages || {
             echo "gh-pages branch does not exist, creating it..."
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
             git checkout --orphan gh-pages
             git reset --hard
             mkdir -p dev/bench
