@@ -134,7 +134,6 @@ impl ApexSDK {
     /// # Ok(())
     /// # }
     /// ```
-    #[allow(clippy::result_large_err)]
     pub fn substrate(&self) -> Result<&SubstrateAdapter> {
         self.substrate_adapter
             .as_ref()
@@ -165,7 +164,6 @@ impl ApexSDK {
     /// # Ok(())
     /// # }
     /// ```
-    #[allow(clippy::result_large_err)]
     pub fn evm(&self) -> Result<&EvmAdapter> {
         self.evm_adapter
             .as_ref()
@@ -210,8 +208,7 @@ impl ApexSDK {
             | Chain::Acala
             | Chain::Phala
             | Chain::Bifrost
-            | Chain::Westend
-            | Chain::Paseo => self.substrate_adapter.is_some(),
+            | Chain::Westend => self.substrate_adapter.is_some(),
             Chain::Ethereum
             | Chain::Polygon
             | Chain::BinanceSmartChain
@@ -238,8 +235,7 @@ impl ApexSDK {
             | Chain::Acala
             | Chain::Phala
             | Chain::Bifrost
-            | Chain::Westend
-            | Chain::Paseo => self
+            | Chain::Westend => self
                 .substrate()?
                 .get_transaction_status(tx_hash)
                 .await
@@ -271,10 +267,19 @@ impl ApexSDK {
         TransactionBuilder::new()
     }
 
-    /// Execute a transaction
+    /// Prepare and validate a transaction
+    ///
+    /// This method validates that the required adapters are configured and
+    /// prepares the transaction for execution. Returns a transaction result
+    /// with status set to Pending, indicating the transaction is ready to
+    /// be signed and broadcast.
+    ///
+    /// Note: Actual transaction signing and broadcasting requires a signer.
+    /// Use the substrate or EVM adapter directly with a wallet for full
+    /// transaction execution.
     pub async fn execute(&self, transaction: Transaction) -> Result<TransactionResult> {
         tracing::info!(
-            "Executing transaction from {:?} to {:?}",
+            "Preparing transaction from {:?} to {:?}",
             transaction.source_chain,
             transaction.destination_chain
         );
@@ -286,8 +291,7 @@ impl ApexSDK {
             | Chain::Acala
             | Chain::Phala
             | Chain::Bifrost
-            | Chain::Westend
-            | Chain::Paseo => {
+            | Chain::Westend => {
                 self.substrate()?;
             }
             Chain::Ethereum
@@ -306,49 +310,26 @@ impl ApexSDK {
             }
         }
 
-        // For MVP, return a mock successful result
-        // In production, this would interact with the actual blockchain
-        let source_tx_hash = format!(
-            "0x{}",
-            hex::encode(
-                transaction
-                    .from
-                    .as_str()
-                    .as_bytes()
-                    .iter()
-                    .take(8)
-                    .cloned()
-                    .collect::<Vec<u8>>()
-            )
-        );
+        // Compute transaction hash using the transaction's hash method
+        let source_tx_hash = transaction.hash();
 
+        // For cross-chain transactions, generate a destination hash
         let destination_tx_hash = if transaction.is_cross_chain() {
-            Some(format!(
-                "0x{}",
-                hex::encode(
-                    transaction
-                        .to
-                        .as_str()
-                        .as_bytes()
-                        .iter()
-                        .take(8)
-                        .cloned()
-                        .collect::<Vec<u8>>()
-                )
-            ))
+            // Create a modified hash for the destination chain
+            let mut dest_tx = transaction.clone();
+            std::mem::swap(&mut dest_tx.from, &mut dest_tx.to);
+            Some(dest_tx.hash())
         } else {
             None
         };
 
+        // Return transaction as pending - ready for signing
         Ok(TransactionResult {
             source_tx_hash,
             destination_tx_hash,
-            status: TransactionStatus::Confirmed {
-                block_hash: "0xabc123".to_string(),
-                block_number: Some(12345),
-            },
-            block_number: Some(12345),
-            gas_used: Some(21000),
+            status: TransactionStatus::Pending,
+            block_number: None,
+            gas_used: None,
         })
     }
 }
@@ -422,7 +403,6 @@ mod tests {
 
         assert!(sdk.is_chain_supported(&Chain::Polkadot));
         assert!(sdk.is_chain_supported(&Chain::Kusama));
-        assert!(sdk.is_chain_supported(&Chain::Paseo));
         assert!(!sdk.is_chain_supported(&Chain::Ethereum));
         assert!(!sdk.is_chain_supported(&Chain::Polygon));
         assert!(!sdk.is_chain_supported(&Chain::Moonbeam)); // Requires both adapters
@@ -439,7 +419,6 @@ mod tests {
 
         assert!(!sdk.is_chain_supported(&Chain::Polkadot));
         assert!(!sdk.is_chain_supported(&Chain::Kusama));
-        assert!(!sdk.is_chain_supported(&Chain::Paseo));
         assert!(sdk.is_chain_supported(&Chain::Ethereum));
         assert!(sdk.is_chain_supported(&Chain::Polygon));
         assert!(!sdk.is_chain_supported(&Chain::Moonbeam)); // Requires both adapters
@@ -502,7 +481,9 @@ mod tests {
 
         let tx_result = result.unwrap();
         assert!(!tx_result.source_tx_hash.is_empty());
+        assert!(tx_result.source_tx_hash.starts_with("0x"));
         assert!(tx_result.destination_tx_hash.is_none());
+        assert!(matches!(tx_result.status, TransactionStatus::Pending));
     }
 
     #[tokio::test]
@@ -530,6 +511,8 @@ mod tests {
 
         let tx_result = result.unwrap();
         assert!(!tx_result.source_tx_hash.is_empty());
+        assert!(tx_result.source_tx_hash.starts_with("0x"));
         assert!(tx_result.destination_tx_hash.is_some());
+        assert!(matches!(tx_result.status, TransactionStatus::Pending));
     }
 }

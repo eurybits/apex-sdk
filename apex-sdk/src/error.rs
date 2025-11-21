@@ -9,23 +9,23 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Error, Debug)]
 pub enum Error {
     /// Configuration error
-    #[error("Configuration error: {0}\n\n💡 Tip: {1}")]
+    #[error("Configuration error: {0}\n\nTip: {1}")]
     Config(String, String),
 
     /// Connection error
-    #[error("Connection error: {0}\n\n💡 Tip: {1}")]
+    #[error("Connection error: {0}\n\nTip: {1}")]
     Connection(String, String),
 
     /// Transaction error
-    #[error("Transaction error: {0}\n\n💡 Tip: {1}")]
+    #[error("Transaction error: {0}\n\nTip: {1}")]
     Transaction(String, String),
 
     /// Chain not supported
-    #[error("Chain not supported: {0}\n\n💡 Supported chains: Polkadot, Kusama, Westend (Substrate) | Ethereum, BSC, Polygon (EVM)\n💡 Use `apex chain list` to see all supported chains")]
+    #[error("Chain not supported: {0}\n\nSupported chains: Polkadot, Kusama, Westend (Substrate) | Ethereum, BSC, Polygon (EVM)\nUse `apex chain list` to see all supported chains")]
     UnsupportedChain(String),
 
     /// Invalid address format
-    #[error("Invalid address format: {0}\n\n💡 Expected formats:\n  • Substrate (SS58): 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY\n  • Ethereum (Hex): 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb")]
+    #[error("Invalid address format: {0}\n\nExpected formats:\n  -Substrate (SS58): 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY\n  -Ethereum (Hex): 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb")]
     InvalidAddress(String),
 
     /// Substrate adapter error
@@ -113,7 +113,7 @@ mod tests {
         assert!(error
             .to_string()
             .contains("Configuration error: test config error"));
-        assert!(error.to_string().contains("💡 Tip:"));
+        assert!(error.to_string().contains("Tip:"));
     }
 
     #[test]
@@ -122,7 +122,7 @@ mod tests {
         assert!(error
             .to_string()
             .contains("Connection error: failed to connect"));
-        assert!(error.to_string().contains("💡 Tip:"));
+        assert!(error.to_string().contains("Tip:"));
     }
 
     #[test]
@@ -131,14 +131,14 @@ mod tests {
         assert!(error
             .to_string()
             .contains("Transaction error: invalid transaction"));
-        assert!(error.to_string().contains("💡 Tip:"));
+        assert!(error.to_string().contains("Tip:"));
     }
 
     #[test]
     fn test_unsupported_chain_error_display() {
         let error = Error::UnsupportedChain("Unknown".to_string());
         assert!(error.to_string().contains("Chain not supported: Unknown"));
-        assert!(error.to_string().contains("💡 Supported chains:"));
+        assert!(error.to_string().contains("Supported chains:"));
     }
 
     #[test]
@@ -147,7 +147,7 @@ mod tests {
         assert!(error
             .to_string()
             .contains("Invalid address format: 0xinvalid"));
-        assert!(error.to_string().contains("💡 Expected formats:"));
+        assert!(error.to_string().contains("Expected formats:"));
     }
 
     #[test]
