@@ -90,7 +90,14 @@ jobs:
 
       - name: Move benchmark output to safe location
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: mv output.txt /tmp/bench-output.txt
+        run: |
+          if [ -f output.txt ]; then
+            mv output.txt /tmp/bench-output.txt
+            echo "✓ Benchmark output moved to /tmp/bench-output.txt"
+          else
+            echo "✗ Warning: output.txt not found, creating empty file"
+            echo "# No benchmark results" > /tmp/bench-output.txt
+          fi
 
       - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
