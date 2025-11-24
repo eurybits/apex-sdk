@@ -15,8 +15,6 @@ readme = "README.md"
 [dependencies]
 apex-sdk-types = { path = "../apex-sdk-types", version = "0.1.4" }
 async-trait = { workspace = true }
-anyhow = { workspace = true }
-thiserror = { workspace = true }
 rand = "0.8"
 tokio = { workspace = true, optional = true }
 

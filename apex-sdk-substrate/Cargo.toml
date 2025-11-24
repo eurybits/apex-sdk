@@ -24,7 +24,6 @@ apex-sdk-core = { path = "../apex-sdk-core", version = "0.1.4" }
 apex-sdk-types = { path = "../apex-sdk-types", version = "0.1.4" }
 tokio = { workspace = true }
 async-trait = { workspace = true }
-anyhow = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 

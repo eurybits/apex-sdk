@@ -9,6 +9,11 @@ members = [
 ]
 resolver = "2"
 
+# Known Issues:
+# - trie-db v0.30.0 has future incompatibility warnings related to never type fallback
+#   This is a transitive dependency from Substrate crates (sp-trie, sp-state-machine)
+#   and will be fixed upstream. See: https://github.com/paritytech/trie/issues
+
 [workspace.package]
 version = "0.1.4"
 edition = "2021"
