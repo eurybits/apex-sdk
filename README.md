@@ -1,4 +1,4 @@
-# Apex SDK Protocol - Unified Rust SDK for Substrate & EVM Blockchain Development
+# Apex SDK Protocol
 
 [![CI](https://github.com/kherldhussein/apex-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/kherldhussein/apex-sdk/actions/workflows/ci.yml)
 [![Security](https://github.com/kherldhussein/apex-sdk/actions/workflows/security.yml/badge.svg)](https://github.com/kherldhussein/apex-sdk/actions/workflows/security.yml/badge.svg)
@@ -80,16 +80,16 @@ cargo install --path ./cli
 
 ### Currently Supported
 
-| Chain | Type | Status | Features |
-|-------|------|--------|----------|
-| Polkadot | Substrate | Stable | Full support |
-| Kusama | Substrate | Stable | Full support |
-| Ethereum | EVM | Stable | Full support |
-| BSC | EVM | Stable | Full support |
-| Polygon | EVM | Stable | Full support |
-| Avalanche | EVM | Stable | Full support |
-| Moonbeam | Hybrid | Stable | Substrate + EVM |
-| Astar | Hybrid | Stable | Substrate + EVM |
+| Chain     | Type      | Status | Features        |
+| --------- | --------- | ------ | --------------- |
+| Polkadot  | Substrate | Stable | Full support    |
+| Kusama    | Substrate | Stable | Full support    |
+| Ethereum  | EVM       | Stable | Full support    |
+| BSC       | EVM       | Stable | Full support    |
+| Polygon   | EVM       | Stable | Full support    |
+| Avalanche | EVM       | Stable | Full support    |
+| Moonbeam  | Hybrid    | Stable | Substrate + EVM |
+| Astar     | Hybrid    | Stable | Substrate + EVM |
 
 ### Coming Soon
 
@@ -104,13 +104,13 @@ cargo install --path ./cli
 
 ### Quick Links
 
-| Resource | Description |
-|----------|-------------|
-| [**Quick Start**](./docs/QUICK_START.md) | Get started in 5 minutes |
-| [**API Reference**](./docs/API.md) | Complete API documentation |
-| [**CLI Guide**](./docs/CLI_GUIDE.md) | Command-line tools guide |
-| [**Roadmap**](./docs/ROADMAP.md) | Development roadmap & priorities |
-| [**Security**](./docs/SECURITY.md) | Security policies & reporting |
+| Resource                                 | Description                      |
+| ---------------------------------------- | -------------------------------- |
+| [**Quick Start**](./docs/QUICK_START.md) | Get started in 5 minutes         |
+| [**API Reference**](./docs/API.md)       | Complete API documentation       |
+| [**CLI Guide**](./docs/CLI_GUIDE.md)     | Command-line tools guide         |
+| [**Roadmap**](./docs/ROADMAP.md)         | Development roadmap & priorities |
+| [**Security**](./docs/SECURITY.md)       | Security policies & reporting    |
 
 ### Examples
 
@@ -133,20 +133,22 @@ Check out the [`examples/`](./examples) directory for complete working examples:
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 **Quick Start:**
+
 ```bash
 git clone https://github.com/kherldhussein/apex-sdk.git
 cd apex-sdk
 cargo test --all-features
 ```
 
-**[→ Development Guide](./docs/DEVELOPMENT.md)** | **[→ Code of Conduct](./CODE_OF_CONDUCT.md)**
+**[Development Guide](./docs/DEVELOPMENT.md)**
 
 ## Security
 
 **Report vulnerabilities:** kherld@duck.com
 
-**[→ Security Policy](./docs/SECURITY.md)** | **[→ Security Audit](./docs/SECURITY_AUDIT.md)**
+**[Security Policy](./docs/SECURITY.md)** | **[Security Audit](./docs/SECURITY_AUDIT.md)**
 
 ## License
 
 [Apache 2.0](LICENSE)
+
