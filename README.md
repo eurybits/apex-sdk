@@ -8,9 +8,9 @@
 [![Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://apexsdk.dev/)
 [![Crates.io](https://img.shields.io/crates/v/apex-sdk.svg)](https://crates.io/crates/apex-sdk)
 
-> **Build secure, cross-chain blockchain applications with compile-time safety**
+> **Build secure, multi-chain blockchain applications with compile-time safety**
 
-Apex SDK Protocol is a compile-time safe, unified Rust SDK that enables developers to build cross-chain applications spanning Substrate and EVM ecosystems. With a single, intuitive API, reduce development complexity while ensuring type safety and native performance across Polkadot, Kusama, Ethereum, and more.
+Apex SDK Protocol is a compile-time safe, unified Rust SDK that enables developers to build multi-chain applications spanning Substrate and EVM ecosystems. With a single, intuitive API, reduce development complexity while ensuring type safety and native performance across Polkadot, Kusama, Ethereum, and more.
 
 ## Features
 
@@ -18,9 +18,9 @@ Apex SDK Protocol is a compile-time safe, unified Rust SDK that enables develope
 - **Compile-Time Type Safety**: Catch errors before deployment, not in production
 - **Native Performance**: Rust-based implementation for optimal execution speed
 - **Metadata-Driven**: Automatic type generation from blockchain runtime metadata
-- **Cross-Chain Ready**: Built-in support for cross-chain communication
+- **Multi-Chain Ready**: Built-in support for multi-chain communication
 - **Modular Architecture**: Easy to extend with new blockchain protocols
-- **Comprehensive Testing**: Built-in testing framework for cross-chain scenarios
+- **Comprehensive Testing**: Built-in testing framework for multi-chain scenarios
 - **Developer Friendly**: Extensive documentation and examples
 
 ## Quick Start
@@ -31,11 +31,11 @@ Get started with Apex SDK in under 5 mins:
 # Install Apex SDK CLI
 cargo install apex-sdk-cli
 
-# Create a new cross-chain project
-apex new my-cross-chain-app
+# Create a new multi-chain project
+apex new my-multi-chain-app
 
 # Navigate to project directory
-cd my-cross-chain-app
+cd my-multi-chain-app
 
 # Build and test
 cargo build
@@ -117,7 +117,7 @@ cargo install --path ./cli
 Check out the [`examples/`](./examples) directory for complete working examples:
 
 - [`account-manager/`](./examples/account-manager/) - Multi-chain account management
-- [`price-oracle/`](./examples/price-oracle/) - Cross-chain price aggregation
+- [`price-oracle/`](./examples/price-oracle/) - Multi-chain price aggregation
 - [`contract-orchestration/`](./examples/contract-orchestration/) - Smart contract deployment
 - [`parachain-assets/`](./examples/parachain-assets/) - Parachain asset management
 
