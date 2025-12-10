@@ -36,6 +36,9 @@ tmp/
 temp/
 *.tmp
 
+# Build output
+dist/
+
 # Generated metadata (but keep mod.rs which is the module declaration)
 /apex-sdk-substrate/src/metadata/*.rs
 !/apex-sdk-substrate/src/metadata/mod.rs
