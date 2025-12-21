@@ -22,7 +22,7 @@ authors = ["Khalid Hussein <kherld.hussein@gmail.com>"]
 rust-version = "1.85"
 readme = "README.md"
 license = "Apache-2.0"
-repository = "https://github.com/eurybits/apex-sdk"
+repository = "https://github.com/carbobit/apex-sdk"
 homepage = "https://apexsdk.dev/"
 keywords = ["blockchain", "substrate", "evm", "cross-chain", "web3"]
 documentation = "https://apexsdk.dev/"
@@ -81,7 +81,42 @@ apex-sdk-substrate = { path = "apex-sdk-substrate" }
 apex-sdk-evm = { path = "apex-sdk-evm" }
 apex-sdk-types = { path = "apex-sdk-types" }
 
+# Development profile - fast compilation, minimal optimizations
+[profile.dev]
+opt-level = 0
+debug = true
+overflow-checks = true
+
+# Release profile - production use with maximum security and performance
 [profile.release]
-opt-level = 3
-lto = true
+opt-level = 3              # Maximum optimization
+lto = "fat"                # Full link-time optimization for security
+codegen-units = 1          # Single codegen unit for better optimization
+panic = "abort"            # Abort on panic (no unwinding, smaller binary)
+strip = true               # Strip symbols for smaller binary and security
+overflow-checks = true     # Keep overflow checks in release builds for safety
+
+# Security-hardened profile for production deployments
+[profile.release-secure]
+inherits = "release"
+opt-level = "z"            # Optimize for size (smaller attack surface)
+lto = "fat"
 codegen-units = 1
+panic = "abort"
+strip = true
+overflow-checks = true
+debug-assertions = false
+incremental = false
+
+# Benchmark profile - optimized for performance testing
+[profile.bench]
+inherits = "release"
+lto = "thin"               # Thin LTO for faster builds
+debug = true               # Keep debug info for profiling
+
+# Test profile - security checks enabled
+[profile.test]
+opt-level = 1
+debug = true
+overflow-checks = true
+debug-assertions = true
