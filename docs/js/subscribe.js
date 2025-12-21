@@ -1,7 +1,16 @@
 /* Newsletter subscription via Web3Forms */
 (function(){
-  const ENDPOINT = 'https://api.web3forms.com/submit';
-  const ACCESS_KEY = '__WEB3FORMS_ACCESS_KEY__';
+  // Wait for CONFIG to be available
+  function getConfig() {
+    return window.CONFIG?.web3forms || {
+      endpoint: 'https://api.web3forms.com/submit',
+      accessKey: '__WEB3FORMS_ACCESS_KEY__'
+    };
+  }
+
+  const config = getConfig();
+  const ENDPOINT = config.endpoint;
+  const ACCESS_KEY = config.accessKey;
 
   function $(sel, root=document){ return root.querySelector(sel); }
 
