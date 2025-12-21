@@ -145,7 +145,7 @@ Check out the [`examples/`](./examples) directory for complete working examples:
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines
 
 **Quick Start:**
 
