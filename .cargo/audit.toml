@@ -6,6 +6,21 @@
 ignore = [
     # === VULNERABILITIES ===
     
+    # ruint 1.17.0 reciprocal_mg10 unsoundness (RUSTSEC-2025-0137)
+    # ------------------------------------------------
+    # Source: alloy-primitives -> ruint 1.17.0
+    # Issue: Unsoundness in safe reciprocal_mg10 function allowing out-of-bounds access
+    # Risk Assessment: LOW
+    #   - Function not directly used in application code
+    #   - Transitive dependency from Alloy ecosystem
+    #   - Memory corruption possible if function is called with specific inputs
+    # Mitigation Plan:
+    #   - Short-term: Updated to latest Alloy v1.2.1 and alloy-primitives v1.5.2
+    #   - Monitoring: Waiting for upstream ruint fix
+    #   - Long-term: Will update immediately when ruint releases patched version
+    # Tracking: https://rustsec.org/advisories/RUSTSEC-2025-0137
+    "RUSTSEC-2025-0137",
+
     # ring 0.16.20 AES panic vulnerability (RUSTSEC-2025-0009)
     # ------------------------------------------------
     # Source: ethers -> ethers-providers -> jsonwebtoken -> ring 0.16.20
