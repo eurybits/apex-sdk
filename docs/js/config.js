@@ -40,6 +40,12 @@ const CONFIG = {
         metrics: null, // To be configured for real API
         sandbox: null  // To be configured for code execution
     },
+
+    // Web3Forms Configuration
+    web3forms: {
+        accessKey: '__WEB3FORMS_ACCESS_KEY__', // Will be replaced during deployment
+        endpoint: 'https://api.web3forms.com/submit'
+    },
     
     // Animation Settings
     animations: {
