@@ -182,7 +182,7 @@ fn test_address_evm() {
 
 #[test]
 fn test_all_chain_configs() {
-    let configs = vec![
+    let configs = [
         ChainConfig::polkadot(),
         ChainConfig::kusama(),
         ChainConfig::westend(),
@@ -243,7 +243,7 @@ fn test_custom_chain_configs() {
 
 #[test]
 fn test_error_variants_creation() {
-    let errors = vec![
+    let errors = [
         Error::Connection("test".to_string()),
         Error::Transaction("test".to_string()),
         Error::Metadata("test".to_string()),
@@ -268,7 +268,7 @@ fn test_error_display_formatting() {
 
 #[test]
 fn test_chain_config_various_ss58_prefixes() {
-    let configs = vec![
+    let configs = [
         ChainConfig::custom("Test1", "wss://test1.com", 0),
         ChainConfig::custom("Test2", "wss://test2.com", 42),
         ChainConfig::custom("Test3", "wss://test3.com", 100),
@@ -322,7 +322,7 @@ fn test_multiple_error_messages() {
 
 #[test]
 fn test_chain_config_name_variations() {
-    let configs = vec![
+    let configs = [
         ChainConfig::custom("Polkadot", "wss://test.com", 0),
         ChainConfig::custom("polkadot", "wss://test.com", 0),
         ChainConfig::custom("POLKADOT", "wss://test.com", 0),
@@ -407,7 +407,7 @@ fn test_known_substrate_addresses() {
 
 #[test]
 fn test_chain_config_realistic_endpoints() {
-    let configs = vec![
+    let configs = [
         ChainConfig::custom("Polkadot", "wss://rpc.polkadot.io", 0),
         ChainConfig::custom("Kusama", "wss://kusama-rpc.polkadot.io", 2),
         ChainConfig::custom("Local", "ws://127.0.0.1:9944", 42),
