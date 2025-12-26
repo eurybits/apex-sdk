@@ -430,7 +430,7 @@ fn test_pallet_metadata_various_pallets() {
 
 #[test]
 fn test_storage_query_different_pallets() {
-    let _queries = vec![
+    let _queries = [
         StorageQuery::new("System", "Account"),
         StorageQuery::new("Balances", "TotalIssuance"),
         StorageQuery::new("Timestamp", "Now"),
