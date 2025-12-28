@@ -199,7 +199,8 @@ fn benchmark_cross_chain_operations(c: &mut Criterion) {
                     ))
                     .amount(1_000_000_000_000)
                     .chain(Chain::Polkadot)
-                    .build(),
+                    .build()
+                    .expect("Failed to build transaction"),
             );
 
             #[cfg(feature = "evm")]
@@ -213,7 +214,8 @@ fn benchmark_cross_chain_operations(c: &mut Criterion) {
                         .gas_limit(21000)
                         .gas_price(20_000_000_000)
                         .chain(Chain::Ethereum)
-                        .build(),
+                        .build()
+                        .expect("Failed to build transaction"),
                 );
             }
         })
@@ -265,7 +267,8 @@ fn benchmark_hybrid_chain_operations(c: &mut Criterion) {
                     .gas_limit(21000)
                     .gas_price(20_000_000_000)
                     .chain(Chain::Moonbeam)
-                    .build(),
+                    .build()
+                    .expect("Failed to build transaction"),
             );
         })
     });
@@ -290,7 +293,8 @@ fn benchmark_bulk_transaction_creation(c: &mut Criterion) {
                         ))
                         .amount(1_000_000_000_000)
                         .chain(Chain::Polkadot)
-                        .build(),
+                        .build()
+                        .expect("Failed to build transaction"),
                 );
             }
         })
@@ -313,7 +317,8 @@ fn benchmark_bulk_transaction_creation(c: &mut Criterion) {
                             ))
                             .amount(1_000_000_000_000)
                             .chain(Chain::Polkadot)
-                            .build(),
+                            .build()
+                            .expect("Failed to build transaction"),
                     );
                 }
             })
@@ -334,7 +339,8 @@ fn benchmark_bulk_transaction_creation(c: &mut Criterion) {
                             .gas_limit(21000)
                             .gas_price(20_000_000_000)
                             .chain(Chain::Ethereum)
-                            .build(),
+                            .build()
+                            .expect("Failed to build transaction"),
                     );
                 }
             })
