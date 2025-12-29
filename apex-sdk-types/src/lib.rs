@@ -500,8 +500,6 @@ pub enum Address {
     Substrate(String),
     /// EVM hex address (0x...) - validated with EIP-55 checksum
     Evm(String),
-    /// Move/Aptos hex address (0x... 64 hex chars) - for Movement Network
-    Move(String),
 }
 
 impl Address {
@@ -643,25 +641,18 @@ impl Address {
     /// Convert EVM address to checksummed format
     ///
     /// For EVM addresses, returns the EIP-55 checksummed version.
-    /// For Substrate and Move addresses, returns the address unchanged.
+    /// For Substrate addresses, returns the address unchanged.
     pub fn to_checksum(&self) -> String {
         match self {
             Address::Evm(addr) => to_checksum_address(addr),
-            Address::Substrate(addr) | Address::Move(addr) => addr.clone(),
+            Address::Substrate(addr) => addr.clone(),
         }
-    }
-
-    /// Create a Move address without validation
-    ///
-    /// For Movement Network/Aptos addresses (0x followed by 64 hex characters)
-    pub fn move_addr(addr: impl Into<String>) -> Self {
-        Address::Move(addr.into())
     }
 
     /// Get the address as a string
     pub fn as_str(&self) -> &str {
         match self {
-            Address::Substrate(s) | Address::Evm(s) | Address::Move(s) => s,
+            Address::Substrate(s) | Address::Evm(s) => s,
         }
     }
 
@@ -669,7 +660,6 @@ impl Address {
     ///
     /// For EVM addresses, validates EIP-55 checksum.
     /// For Substrate addresses, validates SS58 format.
-    /// For Move addresses, validates hex format (0x + 64 hex chars).
     pub fn validate(&self) -> Result<(), ValidationError> {
         match self {
             Address::Evm(addr) => {
@@ -684,23 +674,6 @@ impl Address {
             Address::Substrate(addr) => {
                 if !validate_ss58_address(addr) {
                     return Err(ValidationError::InvalidSubstrateAddress(addr.clone()));
-                }
-                Ok(())
-            }
-            Address::Move(addr) => {
-                // Move addresses must be 0x + 64 hex characters
-                if !addr.starts_with("0x") {
-                    return Err(ValidationError::InvalidEvmAddress(format!(
-                        "Move address must start with 0x: {}",
-                        addr
-                    )));
-                }
-                let hex_part = &addr[2..];
-                if hex_part.len() != 64 || !hex_part.chars().all(|c| c.is_ascii_hexdigit()) {
-                    return Err(ValidationError::InvalidEvmAddress(format!(
-                        "Move address must be 0x followed by 64 hex characters: {}",
-                        addr
-                    )));
                 }
                 Ok(())
             }

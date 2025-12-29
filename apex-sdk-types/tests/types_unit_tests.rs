@@ -399,29 +399,6 @@ fn test_address_eq_trait() {
 }
 
 #[test]
-fn test_move_address_edge_cases() {
-    // Test all zeros
-    let zeros = "0x0000000000000000000000000000000000000000000000000000000000000000";
-    let addr = Address::move_addr(zeros);
-    assert!(addr.validate().is_ok());
-
-    // Test all Fs
-    let all_f = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-    let addr = Address::move_addr(all_f);
-    assert!(addr.validate().is_ok());
-
-    // Test lowercase
-    let lowercase = "0xabcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789";
-    let addr = Address::move_addr(lowercase);
-    assert!(addr.validate().is_ok());
-
-    // Test uppercase
-    let uppercase = "0xABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789";
-    let addr = Address::move_addr(uppercase);
-    assert!(addr.validate().is_ok());
-}
-
-#[test]
 fn test_evm_address_with_numbers() {
     // Address with all numbers in hex part
     let addr = Address::evm("0x1234567890123456789012345678901234567890");

@@ -121,8 +121,9 @@ async fn test_substrate_real_transfer_on_westend() {
         "SUBSTRATE_SEED environment variable required. Set it to your testnet seed phrase.",
     );
 
-    // Create wallet
-    let wallet = SubstrateWallet::from_seed(&seed, None).expect("Failed to create wallet");
+    // Create wallet from mnemonic phrase
+    let wallet = SubstrateWallet::from_mnemonic(&seed, apex_sdk_substrate::KeyPairType::Sr25519)
+        .expect("Failed to create wallet");
 
     let from_address = wallet.address();
     println!("From Address: {}", from_address);
@@ -275,7 +276,7 @@ async fn test_parallel_executor_with_real_transactions() {
 
     if !result.failures.is_empty() {
         println!("\nFailed Transactions:");
-        for (i, (tx, error)) in result.failures.iter().enumerate() {
+        for (i, (_tx, error)) in result.failures.iter().enumerate() {
             println!("  {}. Error: {}", i + 1, error);
         }
     }

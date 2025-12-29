@@ -244,80 +244,12 @@ fn test_address_substrate_to_checksum_unchanged() {
 }
 
 #[test]
-fn test_address_move_constructor() {
-    let move_addr = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
-    let addr = Address::move_addr(move_addr);
-    assert!(matches!(addr, Address::Move(_)));
-    assert_eq!(addr.as_str(), move_addr);
-}
-
-#[test]
-fn test_address_move_to_checksum_unchanged() {
-    let move_addr = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
-    let addr = Address::move_addr(move_addr);
-    assert_eq!(addr.to_checksum(), move_addr);
-}
-
-#[test]
-fn test_address_move_validate_valid() {
-    let valid_move_addresses = vec![
-        "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-        "0x0000000000000000000000000000000000000000000000000000000000000001",
-        "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-    ];
-
-    for addr_str in valid_move_addresses {
-        let addr = Address::move_addr(addr_str);
-        assert!(
-            addr.validate().is_ok(),
-            "Expected valid Move address: {}",
-            addr_str
-        );
-    }
-}
-
-#[test]
-fn test_address_move_validate_invalid() {
-    let invalid_move_addresses = vec![
-        (
-            "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-            "no prefix",
-        ),
-        (
-            "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
-            "too short",
-        ),
-        (
-            "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef00",
-            "too long",
-        ),
-        (
-            "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdeg",
-            "invalid hex",
-        ),
-        ("0x123", "way too short"),
-    ];
-
-    for (addr_str, reason) in invalid_move_addresses {
-        let addr = Address::move_addr(addr_str);
-        assert!(
-            addr.validate().is_err(),
-            "Expected invalid Move address {} ({})",
-            addr_str,
-            reason
-        );
-    }
-}
-
-#[test]
 fn test_address_as_str() {
     let substrate = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
     let evm = "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed";
-    let move_addr = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
 
     assert_eq!(Address::substrate(substrate).as_str(), substrate);
     assert_eq!(Address::evm(evm).as_str(), evm);
-    assert_eq!(Address::move_addr(move_addr).as_str(), move_addr);
 }
 
 #[test]
@@ -329,19 +261,12 @@ fn test_address_validate_all_types() {
     let valid_evm = Address::evm("0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed");
     assert!(valid_evm.validate().is_ok());
 
-    let valid_move =
-        Address::move_addr("0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
-    assert!(valid_move.validate().is_ok());
-
     // Invalid addresses
     let invalid_substrate = Address::substrate("invalid");
     assert!(invalid_substrate.validate().is_err());
 
     let invalid_evm = Address::evm("0xinvalid");
     assert!(invalid_evm.validate().is_err());
-
-    let invalid_move = Address::move_addr("0xinvalid");
-    assert!(invalid_move.validate().is_err());
 }
 
 #[test]
@@ -1193,22 +1118,6 @@ proptest! {
         let addr_str = format!("0x{}", s);
         let addr = Address::evm_checked(&addr_str);
         assert!(addr.is_err(), "Invalid length address should fail: {}", addr_str);
-    }
-
-    #[test]
-    fn test_address_move_valid_format(
-        bytes in prop::array::uniform32(0u8..)
-    ) {
-        // Generate a valid Move address (64 hex chars)
-        let addr_str = format!(
-            "0x{}",
-            bytes.iter()
-                .map(|b| format!("{:02x}", b))
-                .collect::<String>()
-        );
-
-        let addr = Address::move_addr(&addr_str);
-        assert!(addr.validate().is_ok(), "Generated Move address should be valid: {}", addr_str);
     }
 
     #[test]
