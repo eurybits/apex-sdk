@@ -6,6 +6,7 @@ members = [
     "apex-sdk-evm",
     "apex-sdk-types",
     "cli",
+    "integration-tests",
 ]
 resolver = "2"
 

@@ -1,0 +1,15 @@
+[package]
+name = "apex-sdk-integration-tests"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+apex-sdk = { path = "../apex-sdk" }
+apex-sdk-evm = { path = "../apex-sdk-evm" }
+apex-sdk-substrate = { path = "../apex-sdk-substrate" }
+tokio = { workspace = true }
+reqwest = "0.12"
+serde_json = { workspace = true }
+alloy = { workspace = true }
+alloy-primitives = { workspace = true }

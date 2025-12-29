@@ -32,13 +32,19 @@ use apex_sdk_evm::EvmAdapter;
 ///     Ok(())
 /// }
 /// ```
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct ApexSDKBuilder {
     #[cfg(feature = "substrate")]
     substrate_endpoint: Option<String>,
 
+    #[cfg(feature = "substrate")]
+    substrate_wallet: Option<apex_sdk_substrate::Wallet>,
+
     #[cfg(feature = "evm")]
     evm_endpoint: Option<String>,
+
+    #[cfg(feature = "evm")]
+    evm_wallet: Option<apex_sdk_evm::wallet::Wallet>,
 
     timeout: Option<Duration>,
 }
@@ -86,6 +92,53 @@ impl ApexSDKBuilder {
     #[cfg(feature = "evm")]
     pub fn with_evm_endpoint(mut self, endpoint: impl Into<String>) -> Self {
         self.evm_endpoint = Some(endpoint.into());
+        self
+    }
+
+    /// Configure a Substrate wallet for signing transactions.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use apex_sdk::ApexSDKBuilder;
+    /// use apex_sdk_substrate::Wallet;
+    /// use apex_sdk_substrate::KeyPairType;
+    ///
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let wallet = Wallet::from_mnemonic("your mnemonic seed phrase here", KeyPairType::Sr25519)?;
+    /// let builder = ApexSDKBuilder::new()
+    ///     .with_substrate_endpoint("wss://polkadot.api.onfinality.io/public-ws")
+    ///     .with_substrate_wallet(wallet);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "substrate")]
+    pub fn with_substrate_wallet(mut self, wallet: apex_sdk_substrate::Wallet) -> Self {
+        self.substrate_wallet = Some(wallet);
+        self
+    }
+
+    /// Configure an EVM wallet for signing transactions.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use apex_sdk::ApexSDKBuilder;
+    /// use apex_sdk_evm::wallet::Wallet;
+    ///
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let wallet = Wallet::from_private_key("your_private_key_here")?;
+    /// let builder = ApexSDKBuilder::new()
+    ///     .with_evm_endpoint("https://mainnet.infura.io/v3/YOUR_KEY")
+    ///     .with_evm_wallet(wallet);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "evm")]
+    pub fn with_evm_wallet(mut self, wallet: apex_sdk_evm::wallet::Wallet) -> Self {
+        self.evm_wallet = Some(wallet);
         self
     }
 
@@ -152,7 +205,6 @@ impl ApexSDKBuilder {
             None
         };
 
-        // Ensure at least one adapter is configured
         #[cfg(all(feature = "substrate", feature = "evm"))]
         {
             if substrate_adapter.is_none() && evm_adapter.is_none() {
@@ -183,8 +235,12 @@ impl ApexSDKBuilder {
         ApexSDK::new(
             #[cfg(feature = "substrate")]
             substrate_adapter,
+            #[cfg(feature = "substrate")]
+            self.substrate_wallet,
             #[cfg(feature = "evm")]
             evm_adapter,
+            #[cfg(feature = "evm")]
+            self.evm_wallet,
             timeout,
         )
     }

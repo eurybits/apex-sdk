@@ -659,7 +659,7 @@ impl Address {
     /// Validate the address format and checksum
     ///
     /// For EVM addresses, validates EIP-55 checksum.
-    /// For Substrate addresses, always returns Ok (validation not implemented).
+    /// For Substrate addresses, validates SS58 format.
     pub fn validate(&self) -> Result<(), ValidationError> {
         match self {
             Address::Evm(addr) => {
@@ -869,7 +869,6 @@ mod tests {
 
     #[test]
     fn test_eip55_valid_checksummed_addresses() {
-        // Test vectors from EIP-55
         let valid_addresses = vec![
             "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed",
             "0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359",
@@ -1048,7 +1047,6 @@ mod tests {
 
     #[test]
     fn test_substrate_ss58_validation_error_types() {
-        // Test invalid format
         let invalid_format = "not-base58!@#";
         let result = Address::substrate_checked(invalid_format);
         assert!(result.is_err());
@@ -1057,7 +1055,6 @@ mod tests {
             _ => panic!("Expected InvalidSubstrateAddress error"),
         }
 
-        // Test invalid checksum (valid base58 but wrong checksum)
         let invalid_checksum = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQX";
         let result = Address::substrate_checked(invalid_checksum);
         assert!(result.is_err());
@@ -1066,14 +1063,12 @@ mod tests {
 
     #[test]
     fn test_validation_error_messages() {
-        // Test EVM validation error
         let invalid_evm = "0xinvalid";
         let result = Address::evm_checked(invalid_evm);
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.to_string().contains("Invalid EVM address"));
 
-        // Test checksum error
         let invalid_checksum = "0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAeD";
         let result = Address::evm_checked(invalid_checksum);
         assert!(result.is_err());
@@ -1083,7 +1078,6 @@ mod tests {
 
     #[test]
     fn test_overflow_protection_in_validation() {
-        // Test that validation handles edge cases without panicking
         let long_string = "a".repeat(1000);
         let result = Address::evm_checked(&long_string);
         assert!(result.is_err());

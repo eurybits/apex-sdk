@@ -37,3 +37,12 @@ url = { workspace = true }
 
 [dev-dependencies]
 futures = "0.3"
+mockito = "1.2"
+wiremock = "0.6"
+tokio-test = "0.4"
+serde_json = "1.0"
+criterion.workspace = true
+
+[[bench]]
+name = "evm_benchmarks"
+harness = false

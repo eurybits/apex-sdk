@@ -73,7 +73,7 @@ pub enum Error {
 }
 
 /// Type alias for the complex Alloy provider type with all fillers
-type AlloyHttpProvider = alloy::providers::fillers::FillProvider<
+pub type AlloyHttpProvider = alloy::providers::fillers::FillProvider<
     alloy::providers::fillers::JoinFill<
         alloy::providers::Identity,
         alloy::providers::fillers::JoinFill<
@@ -99,6 +99,16 @@ pub struct ProviderType {
 }
 
 impl ProviderType {
+    /// Create a new ProviderType from an AlloyHttpProvider
+    ///
+    /// # Note
+    /// This is primarily intended for testing purposes. In production code,
+    /// use `EvmAdapter::connect()` to create a properly initialized provider.
+    #[doc(hidden)]
+    pub fn new(inner: AlloyHttpProvider) -> Self {
+        Self { inner }
+    }
+
     /// Get the current block number
     async fn get_block_number(&self) -> Result<u64, Error> {
         self.inner
@@ -290,7 +300,7 @@ impl EvmAdapter {
     }
 
     /// Get contract instance
-    pub fn contract(&self, address: &str) -> Result<ContractInfo<'_>, Error> {
+    pub fn contract(&self, address: &str) -> Result<ContractInfo, Error> {
         if !self.connected {
             return Err(Error::Connection("Not connected".to_string()));
         }
@@ -301,19 +311,16 @@ impl EvmAdapter {
 
         Ok(ContractInfo {
             address: address.to_string(),
-            adapter: self,
         })
     }
 }
 
 /// Contract information and interaction
-pub struct ContractInfo<'a> {
+pub struct ContractInfo {
     address: String,
-    #[allow(dead_code)]
-    adapter: &'a EvmAdapter,
 }
 
-impl ContractInfo<'_> {
+impl ContractInfo {
     /// Get the contract address
     pub fn address(&self) -> &str {
         &self.address
@@ -345,7 +352,6 @@ mod tests {
 
     #[test]
     fn test_invalid_url_format() {
-        // Test that invalid URLs are rejected during parsing
         // This doesn't require async or network
         let url = url::Url::parse("not-a-valid-url");
         assert!(url.is_err(), "Expected invalid URL to fail parsing");
@@ -356,7 +362,6 @@ mod tests {
         // Create a mock adapter for testing without network
         let adapter = create_mock_adapter();
 
-        // Test invalid addresses
         let invalid_addr = Address::evm("invalid");
         assert!(!adapter.validate_address(&invalid_addr));
 
@@ -436,14 +441,12 @@ mod tests {
     fn test_provider_access() {
         let adapter = create_mock_adapter();
         let _provider = adapter.provider();
-        // Test that we can access the provider
     }
 
     #[test]
     fn test_transaction_hash_validation() {
         let adapter = create_mock_adapter();
 
-        // Test invalid hash formats
         let rt = tokio::runtime::Runtime::new().unwrap();
 
         // Too short hash
@@ -558,7 +561,6 @@ mod tests {
             .await
             .unwrap();
 
-        // Test with a known transaction hash (first ETH transaction ever)
         let result = adapter
             .get_transaction_status(
                 "0x5c504ed432cb51138bcf09aa5e8a410dd4a1e204ef84bfed1be16dfba1b22060",
@@ -574,7 +576,6 @@ mod tests {
             .await
             .unwrap();
 
-        // Test balance query for a known address
         let result = adapter
             .get_balance("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7")
             .await;
