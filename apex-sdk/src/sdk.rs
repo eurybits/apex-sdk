@@ -3,7 +3,7 @@
 use crate::{
     error::{Error, Result},
     transaction::{Transaction, TransactionResult},
-    types::Chain,
+    types::{Address, Chain},
 };
 use std::{sync::Arc, time::Duration};
 
@@ -28,11 +28,11 @@ use apex_sdk_evm::EvmAdapter;
 ///         .with_evm_endpoint("https://mainnet.infura.io/v3/YOUR_KEY")
 ///         .build()
 ///         .await?;
-///     
+///
 ///     // Check if a chain is supported
 ///     println!("Polkadot supported: {}", sdk.is_chain_supported(&Chain::Polkadot));
 ///     println!("Ethereum supported: {}", sdk.is_chain_supported(&Chain::Ethereum));
-///     
+///
 ///     Ok(())
 /// }
 /// ```
@@ -40,8 +40,14 @@ pub struct ApexSDK {
     #[cfg(feature = "substrate")]
     substrate_adapter: Option<Arc<SubstrateAdapter>>,
 
+    #[cfg(feature = "substrate")]
+    substrate_wallet: Option<Arc<apex_sdk_substrate::Wallet>>,
+
     #[cfg(feature = "evm")]
     evm_adapter: Option<Arc<EvmAdapter>>,
+
+    #[cfg(feature = "evm")]
+    evm_wallet: Option<Arc<apex_sdk_evm::wallet::Wallet>>,
 
     timeout: Duration,
 }
@@ -57,7 +63,9 @@ impl ApexSDK {
     /// **Note**: It's recommended to use the builder pattern instead of calling this directly.
     pub fn new(
         #[cfg(feature = "substrate")] substrate_adapter: Option<SubstrateAdapter>,
+        #[cfg(feature = "substrate")] substrate_wallet: Option<apex_sdk_substrate::Wallet>,
         #[cfg(feature = "evm")] evm_adapter: Option<EvmAdapter>,
+        #[cfg(feature = "evm")] evm_wallet: Option<apex_sdk_evm::wallet::Wallet>,
         timeout: Duration,
     ) -> Result<Self> {
         // Ensure at least one adapter is provided
@@ -81,8 +89,14 @@ impl ApexSDK {
             #[cfg(feature = "substrate")]
             substrate_adapter: substrate_adapter.map(Arc::new),
 
+            #[cfg(feature = "substrate")]
+            substrate_wallet: substrate_wallet.map(Arc::new),
+
             #[cfg(feature = "evm")]
             evm_adapter: evm_adapter.map(Arc::new),
+
+            #[cfg(feature = "evm")]
+            evm_wallet: evm_wallet.map(Arc::new),
 
             timeout,
         })
@@ -259,26 +273,332 @@ impl ApexSDK {
         self.timeout
     }
 
+    /// Create a new transaction builder.
+    pub fn transaction(&self) -> crate::transaction::TransactionBuilder {
+        crate::transaction::TransactionBuilder::new()
+    }
+
+    /// Wait for a transaction to be confirmed on the blockchain.
+    ///
+    /// This method polls the blockchain for the transaction receipt and waits
+    /// until it is confirmed (included in a block).
+    ///
+    /// # Arguments
+    ///
+    /// * `tx_hash` - The transaction hash to wait for
+    /// * `chain` - The chain where the transaction was submitted
+    /// * `max_wait` - Optional maximum wait time (defaults to 60 seconds)
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the transaction is confirmed, or an error if it fails or times out.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// # use apex_sdk::{ApexSDK, types::Chain};
+    /// # async fn example(sdk: ApexSDK) -> Result<(), Box<dyn std::error::Error>> {
+    /// let tx = sdk.transaction()
+    ///     .from_evm_address("0x...")
+    ///     .to_evm_address("0x...")
+    ///     .amount(1000)
+    ///     .build()?;
+    ///
+    /// let result = sdk.execute(tx).await?;
+    ///
+    /// // Wait for confirmation
+    /// sdk.wait_for_confirmation(&result.source_tx_hash, &Chain::Ethereum, None).await?;
+    /// println!("Transaction confirmed!");
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn wait_for_confirmation(
+        &self,
+        tx_hash: &str,
+        chain: &Chain,
+        max_wait: Option<Duration>,
+    ) -> Result<()> {
+        let max_wait = max_wait.unwrap_or(Duration::from_secs(60));
+        let start = std::time::Instant::now();
+
+        tracing::info!(
+            "Waiting for transaction {} to be confirmed on {}",
+            tx_hash,
+            chain.name()
+        );
+
+        loop {
+            if start.elapsed() > max_wait {
+                return Err(Error::Transaction(format!(
+                    "Timeout waiting for transaction {} confirmation after {:?}",
+                    tx_hash, max_wait
+                )));
+            }
+
+            // Check transaction status
+            match self.get_transaction_status(tx_hash, chain).await {
+                Ok(status) => {
+                    use apex_sdk_types::TransactionStatus;
+                    match status {
+                        TransactionStatus::Confirmed { .. }
+                        | TransactionStatus::Finalized { .. } => {
+                            tracing::info!(
+                                "Transaction {} confirmed with status {:?}",
+                                tx_hash,
+                                status
+                            );
+                            return Ok(());
+                        }
+                        TransactionStatus::Failed { error } => {
+                            return Err(Error::Transaction(format!(
+                                "Transaction {} failed: {}",
+                                tx_hash, error
+                            )));
+                        }
+                        TransactionStatus::Pending | TransactionStatus::InMempool => {
+                            // Still pending, wait and retry
+                            tracing::debug!("Transaction {} still pending, waiting...", tx_hash);
+                            tokio::time::sleep(Duration::from_secs(2)).await;
+                        }
+                        TransactionStatus::Unknown => {
+                            // Unknown status, wait and retry
+                            tracing::debug!("Transaction {} status unknown, waiting...", tx_hash);
+                            tokio::time::sleep(Duration::from_secs(2)).await;
+                        }
+                    }
+                }
+                Err(e) => {
+                    // Transaction not found yet, might still be in mempool
+                    tracing::debug!("Transaction {} not found yet: {}", tx_hash, e);
+                    tokio::time::sleep(Duration::from_secs(2)).await;
+                }
+            }
+        }
+    }
+
     #[cfg(feature = "substrate")]
     async fn execute_substrate_transaction(
         &self,
-        _adapter: &SubstrateAdapter,
-        _transaction: Transaction,
+        adapter: &SubstrateAdapter,
+        transaction: Transaction,
     ) -> Result<TransactionResult> {
-        // This would contain the actual substrate transaction execution logic
-        // For now, return a placeholder
-        todo!("Implement Substrate transaction execution")
+        // Check if wallet is configured first
+        let wallet = self.substrate_wallet.as_ref().ok_or_else(|| {
+            Error::Transaction(
+                "Substrate wallet not configured. Transaction execution requires signing.\n\
+                \n\
+                To execute Substrate transactions, provide a wallet when building the SDK:\n\
+                \n\
+                use apex_sdk::ApexSDKBuilder;\n\
+                use apex_sdk_substrate::Wallet;\n\
+                \n\
+                let wallet = Wallet::from_seed(\"your mnemonic seed phrase\", None)?;\n\
+                let sdk = ApexSDKBuilder::new()\n\
+                    .with_substrate_endpoint(\"wss://polkadot.api.onfinality.io/public-ws\")\n\
+                    .with_substrate_wallet(wallet)\n\
+                    .build()\n\
+                    .await?;\n\
+                \n\
+                Alternatively, use the adapter API directly:\n\
+                let executor = sdk.substrate()?.transaction_executor();\n\
+                let tx_hash = executor.transfer(&wallet, &to_address, amount).await?;"
+                    .to_string(),
+            )
+        })?;
+
+        // Type conversion: Apex SDK Transaction → Substrate types
+
+        // 1. Convert destination address to Substrate SS58 address string
+        let to_address = match &transaction.to {
+            Address::Substrate(addr) => addr.clone(),
+            _ => {
+                return Err(Error::Transaction(
+                    "Destination address must be Substrate address for Substrate transactions"
+                        .to_string(),
+                ))
+            }
+        };
+
+        // 2. Amount is already u128, no conversion needed
+        let amount = transaction.amount;
+
+        // 3. Check if this is a contract call or simple transfer
+        if transaction.data.is_some() {
+            // Contract calls require more complex handling via the adapter API
+            return Err(Error::Transaction(
+                "Contract calls require using the adapter API directly for proper SCALE encoding.\n\
+                \n\
+                For contract calls, use:\n\
+                let executor = sdk.substrate()?.transaction_executor();\n\
+                // Use subxt dynamic API or typed metadata for contract calls\n\
+                // Example: executor.submit_extrinsic(call_data).await"
+                    .to_string(),
+            ));
+        }
+
+        tracing::debug!(
+            "Preparing Substrate transaction: to={}, amount={}",
+            to_address,
+            amount
+        );
+
+        // Actual execution: Call adapter's transaction executor
+        let executor = adapter.transaction_executor();
+
+        // Execute simple balance transfer and get the transaction hash
+        let tx_hash = executor
+            .transfer(wallet.as_ref(), &to_address, amount)
+            .await
+            .map_err(|e| Error::Transaction(format!("Substrate transaction failed: {}", e)))?;
+
+        tracing::info!(
+            "Substrate transaction submitted: {} → {}, amount: {}, hash: {}",
+            match &transaction.from {
+                Address::Substrate(a) => a.as_str(),
+                _ => "unknown",
+            },
+            to_address,
+            amount,
+            tx_hash
+        );
+
+        // Wait for inclusion in block
+        tracing::debug!("Waiting for transaction inclusion in block...");
+
+        // Note: Substrate transactions are finalized through the consensus mechanism
+        // The transaction_executor.transfer() already waits for the transaction to be
+        // included in a block before returning the hash.
+        //
+        // For more control, you could:
+        // 1. Submit the extrinsic without waiting
+        // 2. Watch for events
+        // 3. Wait for finalization (not just inclusion)
+
+        // TODO: Add configurable confirmation behavior based on SDK settings
+        // - Wait for inclusion only (current behavior)
+        // - Wait for finalization
+        // - Return immediately without waiting
+
+        // Return transaction result with hash
+        let result = TransactionResult::new(tx_hash)
+            .with_status(crate::transaction::TransactionStatus::Success);
+
+        tracing::info!(
+            "Substrate transaction executed successfully, hash: {}",
+            result.source_tx_hash
+        );
+
+        Ok(result)
     }
 
     #[cfg(feature = "evm")]
     async fn execute_evm_transaction(
         &self,
-        _adapter: &EvmAdapter,
-        _transaction: Transaction,
+        adapter: &EvmAdapter,
+        transaction: Transaction,
     ) -> Result<TransactionResult> {
-        // This would contain the actual EVM transaction execution logic
-        // For now, return a placeholder
-        todo!("Implement EVM transaction execution")
+        use alloy_primitives::{Address as EthAddress, U256};
+
+        // Check if wallet is configured first
+        let wallet = self.evm_wallet.as_ref().ok_or_else(|| {
+            Error::Transaction(
+                "EVM wallet not configured. Transaction execution requires signing.\n\
+                \n\
+                To execute EVM transactions, provide a wallet when building the SDK:\n\
+                \n\
+                use apex_sdk::ApexSDKBuilder;\n\
+                use apex_sdk_evm::wallet::Wallet;\n\
+                \n\
+                let wallet = Wallet::from_private_key(\"your_private_key\")?;\n\
+                let sdk = ApexSDKBuilder::new()\n\
+                    .with_evm_endpoint(\"https://eth.llamarpc.com\")\n\
+                    .with_evm_wallet(wallet)\n\
+                    .build()\n\
+                    .await?;\n\
+                \n\
+                Alternatively, use the adapter API directly:\n\
+                let executor = sdk.evm()?.transaction_executor();\n\
+                let tx_hash = executor.send_transaction(&wallet, to_address, U256::from(amount), data).await?;"
+                    .to_string(),
+            )
+        })?;
+
+        // Type conversion: Apex SDK Transaction → Alloy types
+
+        // 1. Convert destination address to EthAddress
+        let to_address = match &transaction.to {
+            Address::Evm(addr) => addr
+                .parse::<EthAddress>()
+                .map_err(|e| Error::Transaction(format!("Invalid EVM address: {}", e)))?,
+            _ => {
+                return Err(Error::Transaction(
+                    "Destination address must be EVM address for EVM transactions".to_string(),
+                ))
+            }
+        };
+
+        // 2. Convert amount to U256
+        let value = U256::from(transaction.amount);
+
+        // 3. Extract optional contract call data
+        let data = transaction.data;
+
+        tracing::debug!(
+            "Preparing EVM transaction: to={:?}, value={}, data_len={}, gas_limit={:?}",
+            to_address,
+            value,
+            data.as_ref().map(|d| d.len()).unwrap_or(0),
+            transaction.gas_limit
+        );
+
+        // Actual execution: Call adapter's transaction executor
+        let executor = adapter.transaction_executor();
+
+        // Execute the transaction and get the hash
+        let tx_hash = executor
+            .send_transaction(wallet.as_ref(), to_address, value, data.clone())
+            .await
+            .map_err(|e| Error::Transaction(format!("EVM transaction failed: {}", e)))?;
+
+        // Convert B256 hash to hex string
+        let tx_hash_str = format!("{:?}", tx_hash);
+
+        tracing::info!(
+            "EVM transaction submitted: {} → {:?}, amount: {}, hash: {}",
+            match &transaction.from {
+                Address::Evm(a) => a.as_str(),
+                _ => "unknown",
+            },
+            to_address,
+            transaction.amount,
+            tx_hash_str
+        );
+
+        // Wait for confirmation (1 block confirmation)
+        tracing::debug!("Waiting for transaction confirmation...");
+
+        // Note: In production, you might want to:
+        // 1. Wait for receipt using provider.get_transaction_receipt(tx_hash).await
+        // 2. Check receipt.status to ensure transaction succeeded
+        // 3. Add configurable confirmation blocks
+        // For now, we return immediately with the transaction hash
+
+        // TODO: Add optional confirmation waiting based on SDK configuration
+        // let receipt = adapter.provider()
+        //     .get_transaction_receipt(tx_hash)
+        //     .await
+        //     .map_err(|e| Error::Transaction(format!("Failed to get receipt: {}", e)))?;
+
+        // Return transaction result with hash
+        let result = TransactionResult::new(tx_hash_str)
+            .with_status(crate::transaction::TransactionStatus::Pending);
+
+        tracing::info!(
+            "EVM transaction executed successfully, hash: {}",
+            result.source_tx_hash
+        );
+
+        Ok(result)
     }
 }
 
@@ -291,6 +611,10 @@ mod tests {
     fn test_new_returns_error_when_no_adapters() {
         let result = ApexSDK::new(
             #[cfg(feature = "substrate")]
+            None,
+            #[cfg(feature = "substrate")]
+            None,
+            #[cfg(feature = "evm")]
             None,
             #[cfg(feature = "evm")]
             None,
@@ -326,8 +650,12 @@ mod tests {
         let sdk = ApexSDK {
             #[cfg(feature = "substrate")]
             substrate_adapter: None,
+            #[cfg(feature = "substrate")]
+            substrate_wallet: None,
             #[cfg(feature = "evm")]
             evm_adapter: None,
+            #[cfg(feature = "evm")]
+            evm_wallet: None,
             timeout: Duration::from_secs(30),
         };
 
@@ -491,7 +819,10 @@ mod tests {
         let sdk = ApexSDK {
             #[cfg(feature = "substrate")]
             substrate_adapter: None,
+            #[cfg(feature = "substrate")]
+            substrate_wallet: None,
             evm_adapter: None,
+            evm_wallet: None,
             timeout: Duration::from_secs(30),
         };
 
@@ -508,8 +839,11 @@ mod tests {
     fn test_get_transaction_status_substrate_not_configured() {
         let sdk = ApexSDK {
             substrate_adapter: None,
+            substrate_wallet: None,
             #[cfg(feature = "evm")]
             evm_adapter: None,
+            #[cfg(feature = "evm")]
+            evm_wallet: None,
             timeout: Duration::from_secs(30),
         };
 
@@ -527,7 +861,10 @@ mod tests {
         let sdk = ApexSDK {
             #[cfg(feature = "substrate")]
             substrate_adapter: None,
+            #[cfg(feature = "substrate")]
+            substrate_wallet: None,
             evm_adapter: None,
+            evm_wallet: None,
             timeout: Duration::from_secs(30),
         };
 
@@ -546,8 +883,12 @@ mod tests {
         let sdk = ApexSDK {
             #[cfg(feature = "substrate")]
             substrate_adapter: None,
+            #[cfg(feature = "substrate")]
+            substrate_wallet: None,
             #[cfg(feature = "evm")]
             evm_adapter: None,
+            #[cfg(feature = "evm")]
+            evm_wallet: None,
             timeout: Duration::from_secs(30),
         };
 

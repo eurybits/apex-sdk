@@ -31,10 +31,30 @@ impl TransactionBuilder {
         self
     }
 
+    /// Set the sender address from an EVM address string
+    pub fn from_evm_address(self, address: &str) -> Self {
+        self.from(Address::evm(address))
+    }
+
+    /// Set the sender address from a Substrate account string
+    pub fn from_substrate_account(self, address: &str) -> Self {
+        self.from(Address::substrate(address))
+    }
+
     /// Set the recipient address
     pub fn to(mut self, address: Address) -> Self {
         self.to = Some(address);
         self
+    }
+
+    /// Set the recipient address from an EVM address string
+    pub fn to_evm_address(self, address: &str) -> Self {
+        self.to(Address::evm(address))
+    }
+
+    /// Set the recipient address from a Substrate account string
+    pub fn to_substrate_account(self, address: &str) -> Self {
+        self.to(Address::substrate(address))
     }
 
     /// Set the transfer amount
@@ -49,6 +69,11 @@ impl TransactionBuilder {
         self
     }
 
+    /// Alias for gas_limit (for consistency with documentation)
+    pub fn with_gas_limit(self, limit: u64) -> Self {
+        self.gas_limit(limit)
+    }
+
     /// Set the gas price
     pub fn gas_price(mut self, price: u64) -> Self {
         self.gas_price = Some(price);
@@ -59,6 +84,11 @@ impl TransactionBuilder {
     pub fn data(mut self, data: Vec<u8>) -> Self {
         self.data = Some(data);
         self
+    }
+
+    /// Alias for data (for consistency with documentation)
+    pub fn with_data(self, data: Vec<u8>) -> Self {
+        self.data(data)
     }
 
     /// Set the target chain
@@ -133,10 +163,53 @@ impl Transaction {
 /// Transaction execution result
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransactionResult {
-    pub hash: String,
+    /// Transaction hash on the source chain
+    pub source_tx_hash: String,
+    /// Transaction hash on the destination chain (for cross-chain transfers)
+    pub destination_tx_hash: Option<String>,
+    /// Transaction status
     pub status: TransactionStatus,
+    /// Block number where transaction was included
     pub block_number: Option<u64>,
+    /// Gas used by the transaction
     pub gas_used: Option<u64>,
+}
+
+impl TransactionResult {
+    /// Create a new transaction result
+    pub fn new(source_tx_hash: String) -> Self {
+        Self {
+            source_tx_hash,
+            destination_tx_hash: None,
+            status: TransactionStatus::Pending,
+            block_number: None,
+            gas_used: None,
+        }
+    }
+
+    /// Set the transaction status
+    pub fn with_status(mut self, status: TransactionStatus) -> Self {
+        self.status = status;
+        self
+    }
+
+    /// Set the block number
+    pub fn with_block_number(mut self, block_number: u64) -> Self {
+        self.block_number = Some(block_number);
+        self
+    }
+
+    /// Set the gas used
+    pub fn with_gas_used(mut self, gas_used: u64) -> Self {
+        self.gas_used = Some(gas_used);
+        self
+    }
+
+    /// Set the destination transaction hash (for cross-chain transfers)
+    pub fn with_destination_tx_hash(mut self, tx_hash: String) -> Self {
+        self.destination_tx_hash = Some(tx_hash);
+        self
+    }
 }
 
 /// Transaction status
@@ -279,13 +352,12 @@ mod tests {
 
     #[test]
     fn test_transaction_result_serialization() {
-        let result = TransactionResult {
-            hash: "0x123".to_string(),
-            status: TransactionStatus::Success,
-            block_number: Some(100),
-            gas_used: Some(21000),
-        };
+        let result = TransactionResult::new("0x123".to_string())
+            .with_status(TransactionStatus::Success)
+            .with_block_number(100)
+            .with_gas_used(21000);
 
         let _serialized = serde_json::to_string(&result).unwrap();
+        assert_eq!(result.source_tx_hash, "0x123");
     }
 }

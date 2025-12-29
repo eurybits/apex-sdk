@@ -785,7 +785,7 @@ mod tests {
 
     #[test]
     fn test_account_name_validation() {
-        let valid_names = ["alice", "bob", "charlie", "my-account", "account_123"];
+        let valid_names = ["Ilara", "bob", "charlie", "my-account", "account_123"];
 
         for name in &valid_names {
             assert!(
@@ -815,7 +815,7 @@ mod tests {
             file_path.to_str().unwrap(),
             "polkadot",
             "wss://invalid.endpoint", // Invalid endpoint should be okay for dry run
-            Some("alice".to_string()),
+            Some("Ilara".to_string()),
             true, // dry_run
         )
         .await;

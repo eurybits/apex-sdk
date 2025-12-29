@@ -547,63 +547,6 @@ impl TransactionExecutor {
     }
 }
 
-/// Builder for constructing extrinsics
-#[allow(dead_code)]
-pub struct ExtrinsicBuilder {
-    client: OnlineClient<PolkadotConfig>,
-    pallet: Option<String>,
-    call: Option<String>,
-    args: Vec<subxt::dynamic::Value>,
-}
-
-impl ExtrinsicBuilder {
-    /// Create a new extrinsic builder
-    pub fn new(client: OnlineClient<PolkadotConfig>) -> Self {
-        Self {
-            client,
-            pallet: None,
-            call: None,
-            args: Vec::new(),
-        }
-    }
-
-    /// Set the pallet name
-    pub fn pallet(mut self, pallet: impl Into<String>) -> Self {
-        self.pallet = Some(pallet.into());
-        self
-    }
-
-    /// Set the call name
-    pub fn call(mut self, call: impl Into<String>) -> Self {
-        self.call = Some(call.into());
-        self
-    }
-
-    /// Add an argument
-    pub fn arg(mut self, arg: subxt::dynamic::Value) -> Self {
-        self.args.push(arg);
-        self
-    }
-
-    /// Add multiple arguments
-    pub fn args(mut self, args: Vec<subxt::dynamic::Value>) -> Self {
-        self.args.extend(args);
-        self
-    }
-
-    /// Build the dynamic transaction payload
-    pub fn build(self) -> Result<impl subxt::tx::Payload> {
-        let pallet = self
-            .pallet
-            .ok_or_else(|| Error::Transaction("Pallet not set".to_string()))?;
-        let call = self
-            .call
-            .ok_or_else(|| Error::Transaction("Call not set".to_string()))?;
-
-        Ok(subxt::dynamic::tx(&pallet, &call, self.args))
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -628,15 +571,5 @@ mod tests {
 
         assert_eq!(config.max_retries, 5);
         assert_eq!(config.initial_delay, Duration::from_secs(1));
-    }
-
-    #[test]
-    fn test_extrinsic_builder() {
-        // We can't test the full build without a client, but we can test the builder pattern
-        let pallet = Some("Balances".to_string());
-        let call = Some("transfer".to_string());
-
-        assert!(pallet.is_some());
-        assert!(call.is_some());
     }
 }

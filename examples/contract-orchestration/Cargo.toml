@@ -16,3 +16,7 @@ anyhow = "1.0"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 hex = "0.4"
+alloy = { version = "1.2.1", features = ["sol-types", "rpc-types"] }
+alloy-primitives = "1.5.2"
+alloy-sol-types = "1.2.1"
+parity-scale-codec = "3.6"
