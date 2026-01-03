@@ -410,15 +410,14 @@ async fn deploy_evm_contract(
 
     spinner.set_message("Estimating gas...");
 
-    // Create transaction executor
-    let executor = adapter.transaction_executor();
-
-    // Estimate gas for deployment (to address is zero for contract creation)
-    let _dummy_to: alloy::primitives::Address = "0x0000000000000000000000000000000000000000"
-        .parse()
-        .unwrap();
-
-    let executor = executor.context("No transaction executor available")?;
+    // Get current gas price from the network
+    use alloy::providers::Provider;
+    let provider = adapter.provider();
+    let gas_price = provider
+        .provider
+        .get_gas_price()
+        .await
+        .context("Failed to get gas price")?;
 
     // Estimate gas for contract deployment
     // Contract deployments typically need more gas than standard transfers
@@ -441,14 +440,14 @@ async fn deploy_evm_contract(
     println!("{}: {}", "From Address".dimmed(), wallet.address());
     println!("{}: {}", "Chain ID".dimmed(), chain_id);
     println!("{}: {}", "Gas Estimate".dimmed(), gas_estimate);
-    println!(
-        "{}: 20 gwei",
-        "Gas Price".dimmed() // Mock gas price
-    );
 
-    // Mock estimated cost calculation
-    let gas_price_gwei = 20.0;
-    let estimated_cost_eth = (gas_estimate as f64) * gas_price_gwei * 1e-9;
+    // Display actual gas price from network
+    let gas_price_gwei = gas_price as f64 / 1e9;
+    println!("{}: {:.2} gwei", "Gas Price".dimmed(), gas_price_gwei);
+
+    // Calculate estimated cost with real gas price
+    let estimated_cost_wei = (gas_estimate as u128) * (gas_price as u128);
+    let estimated_cost_eth = estimated_cost_wei as f64 / 1e18;
     println!(
         "{}: {:.6} ETH",
         "Est. Cost".yellow().bold(),
@@ -495,35 +494,70 @@ async fn deploy_evm_contract(
 
         println!("\n{}", "Broadcasting transaction...".cyan());
 
-        // For contract deployment, send to zero address with bytecode as data
-        let _zero_address: alloy::primitives::Address =
-            "0x0000000000000000000000000000000000000000"
-                .parse()
-                .unwrap();
+        // Build deployment transaction
+        use alloy::network::TransactionBuilder;
+        use alloy::primitives::{Bytes, U256};
+        use alloy::rpc::types::TransactionRequest;
 
-        // Send the deployment transaction
-        let dummy_tx = vec![0u8; 32]; // Placeholder transaction bytes
-        let tx_result = executor
-            .execute_transaction(&dummy_tx)
+        // Get nonce
+        let from_address: alloy::primitives::Address = wallet
+            .address()
+            .to_string()
+            .parse()
+            .context("Failed to parse wallet address")?;
+
+        let nonce = provider
+            .provider
+            .get_transaction_count(from_address)
+            .await
+            .context("Failed to get nonce")?;
+
+        // Create deployment transaction request (no 'to' address for contract creation)
+        let tx_request = TransactionRequest::default()
+            .with_from(from_address)
+            .with_chain_id(chain_id)
+            .with_nonce(nonce)
+            .with_gas_limit(gas_estimate)
+            .with_gas_price(gas_price as u128)
+            .with_value(U256::ZERO)
+            .with_input(Bytes::from(contract_data.clone()));
+
+        // Send transaction directly using provider
+        use alloy::providers::Provider;
+        let pending_tx = provider
+            .provider
+            .send_transaction(tx_request)
             .await
             .context("Failed to send deployment transaction")?;
 
-        println!("{}: {}", "Transaction Hash".cyan(), tx_result.hash);
+        let tx_hash = format!("0x{:x}", *pending_tx.tx_hash());
+        println!("{}: {}", "Transaction Hash".cyan(), &tx_hash);
 
         // Wait for confirmation
         println!("{}", "Waiting for confirmation...".yellow());
 
-        // Wait for transaction to be mined
-        // In a real implementation, this would poll for the receipt
-        // For now, we wait a reasonable time for block inclusion
-        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+        // Wait for transaction receipt
+        let receipt = pending_tx
+            .get_receipt()
+            .await
+            .context("Failed to get transaction receipt")?;
 
-        // Extract contract address from transaction result
-        // Contract address is deterministically computed from sender address and nonce
-        // Format: keccak256(rlp([sender_address, nonce]))[12:]
-        // For simplicity, we indicate that contract address would be in the receipt
-        let contract_address = "0x0000000000000000000000000000000000000000"; // Placeholder - would be in receipt
-        let tx_hash = &tx_result.hash;
+        // Extract results from receipt
+        let contract_address = receipt
+            .contract_address
+            .map(|addr| format!("0x{:x}", addr))
+            .unwrap_or_else(|| "N/A".to_string());
+
+        let block_number = receipt.block_number.unwrap_or(0);
+        let actual_gas_used = receipt.gas_used;
+        let effective_gas_price = receipt.effective_gas_price;
+
+        // Check deployment status
+        if !receipt.status() {
+            println!("\n{}", "Deployment Failed!".red().bold());
+            println!("{}: Transaction reverted", "Error".red());
+            return Err(anyhow::anyhow!("Contract deployment transaction reverted"));
+        }
 
         println!("\n{}", "Deployment Successful".green().bold());
         println!("{}", "═══════════════════════════════════════".dimmed());
@@ -533,16 +567,12 @@ async fn deploy_evm_contract(
             contract_address
         );
         println!("{}: {}", "Transaction Hash".cyan(), tx_hash);
-        println!(
-            "{}: 12345",
-            "Block Number".dimmed() // Mock block number
-        );
-        println!("{}: {}", "Gas Used".dimmed(), gas_estimate);
+        println!("{}: {}", "Block Number".dimmed(), block_number);
+        println!("{}: {}", "Gas Used".dimmed(), actual_gas_used);
 
-        // Calculate actual cost with mock values
-        let gas_used = gas_estimate as u128;
-        let gas_price = 20_000_000_000u128; // 20 gwei in wei
-        let actual_cost_wei = gas_used * gas_price;
+        // Calculate actual cost with real values from receipt
+        let gas_used = actual_gas_used as u128;
+        let actual_cost_wei = gas_used * (effective_gas_price as u128);
 
         // Format to ETH
         let actual_cost_eth = format_wei_to_eth(actual_cost_wei);
