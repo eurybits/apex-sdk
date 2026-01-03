@@ -366,7 +366,7 @@ impl SubstrateAdapter {
                             block_hash.to_string(),
                             None,
                             None,
-                            Some(confirmations as u32),
+                            Some(confirmations),
                         ))
                     } else if let Some(error) = error_msg {
                         Ok(OldTransactionStatus::failed(tx_hash.to_string(), error))
