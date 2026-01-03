@@ -482,14 +482,55 @@ fn validate_ss58_for_network(addr: &str, expected_ss58_format: u16) -> bool {
 
     // Extract SS58 format from first byte(s)
     let network_id = if decoded[0] & 0b01000000 == 0 {
-        // Simple format: 6-bit network ID
+        // Simple format: 6-bit network ID (0-63)
         u16::from(decoded[0] & 0b00111111)
     } else {
-        // Reserved/extended format: not implemented for now
-        return expected_ss58_format >= 64;
+        // Extended format: 14-bit network ID
+        // First byte: 01xxxxxx (6 bits, lower part)
+        // Second byte: xxxxxxxx (8 bits, upper part)
+        // Network ID = ((first_byte & 0x3F) << 2) | ((second_byte & 0xFC) >> 2) | 0x0040
+        if decoded.len() < 2 {
+            return false;
+        }
+        let lower = u16::from(decoded[0] & 0b00111111);
+        let upper = u16::from(decoded[1]);
+        // Combine to form 14-bit ID: lower 6 bits from first byte, upper 8 bits from second byte
+        ((lower << 8) | upper) | 0x0040
     };
 
     network_id == expected_ss58_format
+}
+
+/// Extract SS58 network prefix from an address string
+/// Returns None if the address cannot be decoded
+pub fn extract_ss58_prefix(address: &str) -> Option<u16> {
+    use bs58;
+
+    // Decode the base58 string
+    let decoded = match bs58::decode(address).into_vec() {
+        Ok(bytes) => bytes,
+        Err(_) => return None,
+    };
+
+    if decoded.is_empty() {
+        return None;
+    }
+
+    // Extract SS58 format from first byte(s)
+    let network_id = if decoded[0] & 0b01000000 == 0 {
+        // Simple format: 6-bit network ID (0-63)
+        u16::from(decoded[0] & 0b00111111)
+    } else {
+        // Extended format: 14-bit network ID
+        if decoded.len() < 2 {
+            return None;
+        }
+        let lower = u16::from(decoded[0] & 0b00111111);
+        let upper = u16::from(decoded[1]);
+        ((lower << 8) | upper) | 0x0040
+    };
+
+    Some(network_id)
 }
 
 /// Generic address type for different chains
