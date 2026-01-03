@@ -8,10 +8,11 @@
 
 use crate::Error;
 use alloy::primitives::{Address as EthAddress, Signature, B256};
-use alloy::signers::{
-    local::{coins_bip39::English, MnemonicBuilder, PrivateKeySigner},
-    Signer,
-};
+use alloy::signers::Signer;
+use alloy_signer_local::{coins_bip39::English, MnemonicBuilder, PrivateKeySigner};
+use apex_sdk_core::{SdkError, Signer as CoreSigner};
+use apex_sdk_types::Address;
+use async_trait::async_trait;
 use std::str::FromStr;
 
 /// Wallet for managing EVM accounts and signing transactions
@@ -216,6 +217,37 @@ impl std::fmt::Debug for Wallet {
             .field("address", &self.address())
             .field("chain_id", &self.chain_id())
             .finish()
+    }
+}
+
+#[async_trait]
+impl CoreSigner for Wallet {
+    async fn sign_transaction(&self, tx: &[u8]) -> std::result::Result<Vec<u8>, SdkError> {
+        use alloy::primitives::keccak256;
+
+        // Properly handle different transaction input formats
+        if tx.len() == 32 {
+            // If it's exactly 32 bytes, treat it as a pre-computed hash
+            let hash = B256::from_slice(tx);
+            let signature = self
+                .sign_transaction_hash(&hash)
+                .await
+                .map_err(|e| SdkError::SignerError(e.to_string()))?;
+            Ok(signature.as_bytes().to_vec())
+        } else {
+            // For any other length, hash the transaction data first
+            // This properly handles RLP-encoded transactions or any other format
+            let hash = keccak256(tx);
+            let signature = self
+                .sign_transaction_hash(&hash)
+                .await
+                .map_err(|e| SdkError::SignerError(e.to_string()))?;
+            Ok(signature.as_bytes().to_vec())
+        }
+    }
+
+    fn address(&self) -> Address {
+        Address::Evm(self.address())
     }
 }
 

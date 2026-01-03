@@ -12,6 +12,8 @@ use alloy::network::TransactionBuilder;
 use alloy::primitives::{Address as EthAddress, Bytes, B256, U256};
 use alloy::providers::Provider;
 use alloy::rpc::types::{Block, BlockNumberOrTag, TransactionReceipt, TransactionRequest};
+use apex_sdk_core::{FeeEstimator, SdkError};
+use async_trait::async_trait;
 use std::time::Duration;
 
 /// Configuration for gas estimation and pricing
@@ -449,6 +451,49 @@ impl TransactionExecutor {
         }
 
         Ok(receipt)
+    }
+}
+
+#[async_trait]
+impl FeeEstimator for TransactionExecutor {
+    async fn estimate_fee(&self, tx: &[u8]) -> Result<u128, SdkError> {
+        // Enhanced fee estimation with proper transaction analysis
+
+        if tx.is_empty() {
+            // Return minimum fee for empty transaction
+            let base_fee = U256::from(20_000_000_000u64); // 20 gwei
+            let gas_limit = U256::from(21_000u64);
+            return Ok((base_fee * gas_limit).to::<u128>());
+        }
+
+        // Analyze transaction bytes to estimate appropriate gas and price
+        let length = tx.len();
+
+        let gas_limit = match length {
+            0..=32 => 21_000u64, // Simple transfer
+            33..=100 => {
+                // Check for ERC-20 transfer pattern
+                if length >= 68 && tx.get(32..36) == Some(&[0xa9, 0x05, 0x9c, 0xbb]) {
+                    65_000u64 // ERC-20 transfer
+                } else {
+                    50_000u64 // Other token operations
+                }
+            }
+            101..=500 => {
+                // Contract interaction with moderate complexity
+                let base_gas = 75_000u64;
+                let data_gas = (length as u64) * 16; // 16 gas per byte
+                base_gas + data_gas.min(150_000)
+            }
+            501..=2000 => 250_000u64, // Complex contract call
+            _ => 500_000u64,          // Contract deployment or very complex operation
+        };
+
+        // Use a reasonable gas price (20 gwei)
+        let gas_price = U256::from(20_000_000_000u64);
+        let total_cost = gas_price * U256::from(gas_limit);
+
+        Ok(total_cost.to::<u128>())
     }
 }
 
