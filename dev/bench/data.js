@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1766999717766,
+  "lastUpdate": 1767427190739,
   "repoUrl": "https://github.com/carbobit/apex-sdk",
   "entries": {
     "Benchmark": [
@@ -2219,6 +2219,216 @@ window.BENCHMARK_DATA = {
             "name": "bulk_transaction_creation/evm_bulk/10",
             "value": 548,
             "range": "± 27",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/dot_to_planck",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/ksm_to_planck",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/eth_to_wei",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/planck_to_dot",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/wei_to_eth",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "chain_metadata_operations/get_rpc_endpoints",
+            "value": 3,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "chain_metadata_operations/check_smart_contract_support",
+            "value": 3,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "chain_metadata_operations/get_chain_ids",
+            "value": 1,
+            "range": "± 0",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "kherld.hussein@gmail.com",
+            "name": "kh3rld",
+            "username": "kh3rld"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "72e541d4184d077027222c601ec7990a7eb1a803",
+          "message": "apex-sdk===v0.1.5 (#69)\n\n* chore(docs): update logos and add new ones\n\n* docs(README): update links\n\n* docs(viewer): improve UI/UX\n\n* docs(viewer): improve UI/UX\n\n* docs(js): update module initialization and add new modules for advanced visualization, metrics, workflow simulator, and personalization\n\n* docs(css): update main stylesheet with new design elements and animations\n\n* docs(search): update search manifest with new categories and paths\n\n* docs(subscribe): update API endpoint and add new subscription handling logic\n\n* Revert \"docs(subscribe): update API endpoint and add new subscription handling logic\"\n\nThis reverts commit 8c1b76092fd71d852af33e6e530af594f7d5cb8c.\n\n* Revert \"docs(search): update search manifest with new categories and paths\"\n\nThis reverts commit 581eaa118c7c0a5c8524b3c9cbb7db47a42b5e0b.\n\n* Revert \"docs(css): update main stylesheet with new design elements and animations\"\n\nThis reverts commit fbe3410ef26484073511a56fa3c2ded72b1dc4c6.\n\n* Revert \"docs(js): update module initialization and add new modules for advanced visualization, metrics, workflow simulator, and personalization\"\n\nThis reverts commit 235e7bbe0f4c95db1d13c32d38856bab005d7311.\n\n* Revert \"docs(viewer): improve UI/UX\"\n\nThis reverts commit 070e644d74c5c28abee8f49147afd051f87caa7a.\n\n* Revert \"docs(viewer): improve UI/UX\"\n\nThis reverts commit f12ba946d40df93c8f846529b867b243405d6a57.\n\n* Revert \"docs(README): update links\"\n\nThis reverts commit b7dcfc536af992ae90dde40f946664ac30ae951d.\n\n* fix(docs): resolve networks display and update footer copyright\n\n- Fix networks not showing on page load by reordering renderChains() before initChainsFilter()\n- Update footer copyright to '© 2026 Apex SDK Protocol by Carbobit'\n- Ensures all network cards display immediately without user interaction\n\nFixes display issues on landing page for v0.1.5 release\n\n* feat(evm): implement RPC URL tracking to EvmProvider\n\n- Add rpc_url field to EvmProvider struct\n- Implement rpc_url() getter method\n- Store endpoint URL for later retrieval by adapter\n\nRequired for proper endpoint() method implementation\n\n* fix(tests): update golden vectors and metrics tests for v0.1.5\n\n- Replace ChainType::Evm with ChainType::Ethereum across all tests\n- Update SubstrateEra from enum variant to struct initialization\n- Fix metrics API calls: record_operation_time() → record_duration()\n- Fix metrics API calls: get_performance_metrics() → get_metrics()\n\nAll 119 tests now passing\n\n* refactor(substrate): update signer implementations and enhance transaction fee estimation\n\n- Updated the SR25519 and ED25519 signer implementations to simplify the code and remove unnecessary account ID storage.\n- Introduced a new method in the TransactionExecutor to estimate fees from raw transaction bytes, using a dummy transfer for estimation.\n- Implemented the FeeEstimator trait for TransactionExecutor with a placeholder for fee estimation from raw bytes.\n- Added async signing capabilities to the Wallet struct by implementing the CoreSigner trait.\n- Created comprehensive tests for the connection pool module, covering configuration, connection management, health checking, and load balancing.\n\n* feat: improve transaction status tracking\n\n* refactor(core): removed unused methods\n\n* feat(substrate): enhance various nonce management\n\n* feat(cli): implement and fix EIP-1559 deployment flow\n\n* test(types): enhance testing and types implementation\n\n* refactor(sdk): enhance transaction and performance optimization\n\n* text(integration): update tests\n\n* docs: refactor and update the UI and documentation for v0.1.5\n\n* docs: update README\n\n* chore(CHANGELOG): restore CHANGELOG\n\n* release: v0.1.5\n\n* fix(ci): update workflows referenced apex-sdk-cli package and apex binary\n\n* fix(cli): remove unused dependencies\n\n* fix(evm): removed redundant (gas_price as u128) cast\n\n* fix(deps): remove unused dependencies\n\n* fix(substrate): removed redundant cast\n\n* fix(cli): removed redundant cast for gas price in estimated cost calculation\n\n---------\n\nCo-authored-by: Kherld <50875687+kherldhussein@users.noreply.github.com>",
+          "timestamp": "2026-01-03T02:49:58-05:00",
+          "tree_id": "a71d81eab365ee33ebfe0c7ae009eaefb1434b2d",
+          "url": "https://github.com/carbobit/apex-sdk/commit/72e541d4184d077027222c601ec7990a7eb1a803"
+        },
+        "date": 1767427190358,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "transaction_creation/create_substrate_transfer",
+            "value": 56,
+            "range": "± 3",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "transaction_creation/create_evm_transfer",
+            "value": 54,
+            "range": "± 2",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/substrate_validation/0",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/substrate_validation/1",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/substrate_validation/2",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/evm_validation/0",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/evm_validation/1",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/evm_validation/2",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "sdk_initialization/create_substrate_sdk",
+            "value": 29,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "sdk_initialization/create_evm_sdk",
+            "value": 29,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "sdk_initialization/create_multi_chain_sdk",
+            "value": 53,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "transaction_signing/substrate_sign_simulation",
+            "value": 160847,
+            "range": "± 626",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "transaction_signing/evm_sign_simulation",
+            "value": 140915,
+            "range": "± 366",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "amount_operations/amount_creation",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "amount_operations/amount_arithmetic",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "cross_chain_operations/chain_type_detection",
+            "value": 3,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "cross_chain_operations/multi_chain_transaction_creation",
+            "value": 110,
+            "range": "± 4",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "cross_chain_operations/cross_chain_address_handling",
+            "value": 20,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "hybrid_chain_operations/hybrid_chain_type_check",
+            "value": 1,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "hybrid_chain_operations/hybrid_evm_transaction",
+            "value": 54,
+            "range": "± 2",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "bulk_transaction_creation/substrate_bulk/10",
+            "value": 546,
+            "range": "± 25",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "bulk_transaction_creation/substrate_bulk/100",
+            "value": 5509,
+            "range": "± 243",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "bulk_transaction_creation/evm_bulk/10",
+            "value": 543,
+            "range": "± 28",
             "unit": "ns/iter"
           },
           {
