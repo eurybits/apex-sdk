@@ -446,7 +446,7 @@ async fn deploy_evm_contract(
     println!("{}: {:.2} gwei", "Gas Price".dimmed(), gas_price_gwei);
 
     // Calculate estimated cost with real gas price
-    let estimated_cost_wei = (gas_estimate as u128) * (gas_price as u128);
+    let estimated_cost_wei = (gas_estimate as u128) * gas_price;
     let estimated_cost_eth = estimated_cost_wei as f64 / 1e18;
     println!(
         "{}: {:.6} ETH",
@@ -518,7 +518,7 @@ async fn deploy_evm_contract(
             .with_chain_id(chain_id)
             .with_nonce(nonce)
             .with_gas_limit(gas_estimate)
-            .with_gas_price(gas_price as u128)
+            .with_gas_price(gas_price)
             .with_value(U256::ZERO)
             .with_input(Bytes::from(contract_data.clone()));
 
