@@ -37,3 +37,7 @@ typed = []
 typed-polkadot = ["typed"]
 typed-kusama = ["typed"]
 typed-westend = ["typed"]
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["sp-runtime"]  # Used in auto-generated metadata files (westend.rs, westend_generated.rs)
+development = ["mockall"]  # May be used in conditional compilation

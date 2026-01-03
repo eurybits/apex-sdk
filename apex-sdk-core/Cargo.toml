@@ -24,3 +24,6 @@ mockall = "0.12.1"
 [features]
 default = []
 mocks = []
+
+[package.metadata.cargo-udeps.ignore]
+development = ["mockall"]  # May be used in conditional compilation
