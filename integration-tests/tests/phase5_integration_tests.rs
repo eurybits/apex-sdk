@@ -7,7 +7,7 @@
 //! - CLI/Examples/Docs are updated
 
 use apex_sdk_core::golden_vectors::{ChainType, GoldenVector, GoldenVectorInput, GoldenVectorSet};
-use apex_sdk_core::metrics::MetricsCollector;
+use apex_sdk_core::metrics::{MetricsCollector, PerformanceMetrics};
 use std::time::Instant;
 
 #[test]
@@ -33,12 +33,12 @@ fn test_phase5_unit_tests_status() {
             chain_id: 1,
         },
         expected_encoded: "deadbeef".to_string(),
-        chain_type: ChainType::Ethereum,
+        chain_type: ChainType::Evm,
         encoding_version: "1.0".to_string(),
     };
 
     assert_eq!(vector.name, "phase5_test");
-    assert_eq!(vector.chain_type, ChainType::Ethereum);
+    assert_eq!(vector.chain_type, ChainType::Evm);
 
     let duration = start.elapsed();
     println!(
@@ -75,7 +75,7 @@ fn test_phase5_golden_vectors_integration() {
             chain_id: 1,
         },
         expected_encoded: "f86c0185044a817c80825208948742d35cc6634c0532925a3b844bc9e7595f0beb7871000000000000000808025a0".to_string(),
-        chain_type: ChainType::Ethereum,
+        chain_type: ChainType::Evm,
         encoding_version: "1.0".to_string(),
     };
 
@@ -103,7 +103,7 @@ fn test_phase5_metrics_collection_integration() {
 
     let start = Instant::now();
 
-    let metrics_collector = MetricsCollector::new();
+    let mut metrics_collector = MetricsCollector::new();
 
     // Simulate some operations for metrics collection
     for i in 0..5 {
@@ -125,29 +125,33 @@ fn test_phase5_metrics_collection_integration() {
                 chain_id: 1,
             },
             expected_encoded: "deadbeef".to_string(),
-            chain_type: ChainType::Ethereum,
+            chain_type: ChainType::Evm,
             encoding_version: "1.0".to_string(),
         };
 
         let op_duration = op_start.elapsed();
 
         // Record metrics
-        metrics_collector.record_duration(format!("golden_vector_creation_{}", i), op_duration);
+        metrics_collector
+            .record_operation_time(format!("golden_vector_creation_{}", i), op_duration);
     }
 
     // Get performance metrics
-    let performance_metrics = metrics_collector.get_metrics();
+    let performance_metrics = metrics_collector.get_performance_metrics();
 
     // Verify metrics collection
-    assert!(!performance_metrics.is_empty());
-    assert!(performance_metrics.len() >= 5);
+    assert!(performance_metrics.total_operations > 0);
+    assert!(performance_metrics.average_operation_time.as_nanos() > 0);
 
     let duration = start.elapsed();
     println!(
         "✅ Phase 5 metrics collection integration completed in {:?}",
         duration
     );
-    println!("   Collected {} metrics", performance_metrics.len());
+    println!(
+        "   Collected {} operations with avg time {:?}",
+        performance_metrics.total_operations, performance_metrics.average_operation_time
+    );
 }
 
 #[test]
@@ -174,7 +178,7 @@ fn test_phase5_completion_verification() {
                 chain_id: 1,
             },
             expected_encoded: "completion_test_encoding".to_string(),
-            chain_type: ChainType::Ethereum,
+            chain_type: ChainType::Evm,
             encoding_version: "1.0".to_string(),
         }],
     };
@@ -182,10 +186,10 @@ fn test_phase5_completion_verification() {
     assert_eq!(vector_set.vectors.len(), 1);
 
     // Check 2: Metrics collection is working
-    let metrics = MetricsCollector::new();
-    metrics.record_duration("test_operation".to_string(), start.elapsed());
-    let collected_metrics = metrics.get_metrics();
-    assert!(!collected_metrics.is_empty());
+    let mut metrics = MetricsCollector::new();
+    metrics.record_operation_time("test_operation".to_string(), start.elapsed());
+    let performance = metrics.get_performance_metrics();
+    assert!(performance.total_operations > 0);
 
     // Check 3: Serialization/deserialization works
     let json = serde_json::to_string(&vector_set).unwrap();
