@@ -28,7 +28,7 @@
     <link rel="manifest" href="/manifest.json">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/modern.css">
+    <link rel="stylesheet" href="css/modular.css">
 
     <!-- Schema Markup -->
     <script type="application/ld+json">
@@ -65,11 +65,15 @@
     </script>
 </head>
 <body class="loading">
+    <!-- Skip Navigation for Accessibility -->
+    <a href="#main-content" class="skip-nav">Skip to main content</a>
+    <!-- Skip Navigation for Accessibility -->
+    <a href="#main-content" class="skip-nav">Skip to main content</a>
     <!-- Header -->
     <header id="navbar" class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
-                <img src="assets/apex_logo.png" alt="Apex SDK Logo" width="32" height="32">
+                <img src="assets/apex_logo.png" alt="Apex SDK Logo" width="32" height="32" loading="lazy">
                 <span>Apex SDK</span>
             </a>
 
@@ -99,7 +103,7 @@
         </div>
     </header>
 
-    <main id="main-content">
+    <main id="main-content" role="main">
         <!-- Hero Section -->
         <section class="hero">
             <div class="hero-background">
@@ -109,7 +113,7 @@
             <div class="container hero-content">
                 <div class="hero-badge fade-in-up">
                     <span class="badge-dot"></span>
-                    <span>v0.1.5 - Production Ready</span>
+                    <span>v0.1.5 - Alpha Release</span>
                 </div>
                 <h1 class="hero-title fade-in-up delay-1">
                     Build Cross-Chain dApps with
@@ -236,10 +240,10 @@
         <section id="networks" class="networks-section">
             <div class="container">
                 <div class="section-header scroll-reveal">
-                    <span class="section-badge">Multi-Chain Ecosystem</span>
+                    <span class="section-badge">Growing Ecosystem</span>
                     <h2 class="section-title">15+ Networks, One Unified SDK</h2>
                     <p class="section-description">
-                        Build once, deploy everywhere. From Ethereum's robust ecosystem to Polkadot's interoperable parachains—unified under a single, type-safe API.
+                        Build once, deploy everywhere. From Ethereum's robust ecosystem to Polkadot's interoperable parachains—unified under a single, type-safe API that's constantly expanding.
                     </p>
                 </div>
 
@@ -303,8 +307,8 @@
                                         <span class="network-type mainnet">Mainnet</span>
                                     </div>
                                     <div class="network-status">
-                                        <div class="status-dot active"></div>
-                                        <span>Ready</span>
+                                        <div class="status-dot ready"></div>
+                                        <span>Stable</span>
                                     </div>
                                 </div>
                                 <p class="network-description">The world's leading programmable blockchain with the largest developer ecosystem and DeFi liquidity.</p>
@@ -319,7 +323,8 @@
                                 <div class="network-header">
                                     <div class="network-icon arbitrum">
                                         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M12 0L2 12l10 12 10-12L12 0zm0 4.5L19 12l-7 8.5L5 12l7-7.5z"/>
+                                            <path d="M12 2L4 8v8l8 6 8-6V8l-8-6zm0 2.5l6 4.5v6l-6 4.5L6 15V9.5l6-4.5z"/>
+                                            <path d="M12 7l-3 2v4l3 2 3-2V9l-3-2z" opacity="0.7"/>
                                         </svg>
                                     </div>
                                     <div class="network-info">
@@ -327,8 +332,8 @@
                                         <span class="network-type layer2">Layer 2</span>
                                     </div>
                                     <div class="network-status">
-                                        <div class="status-dot active"></div>
-                                        <span>Ready</span>
+                                        <div class="status-dot beta"></div>
+                                        <span>Beta</span>
                                     </div>
                                 </div>
                                 <p class="network-description">High-performance Layer 2 solution with 10x lower fees and Ethereum-grade security guarantees.</p>
@@ -343,7 +348,8 @@
                                 <div class="network-header">
                                     <div class="network-icon polygon">
                                         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M12 2L2 7v10l10 5 10-5V7l-10-5z"/>
+                                            <path d="M16.5 8.5L12 6L7.5 8.5L3 6v12l4.5-2.5L12 18l4.5-2.5L21 18V6l-4.5 2.5z"/>
+                                            <path d="M7.5 8.5v7L12 13v-7l-4.5 2.5z" opacity="0.7"/>
                                         </svg>
                                     </div>
                                     <div class="network-info">
@@ -367,7 +373,8 @@
                                 <div class="network-header">
                                     <div class="network-icon base">
                                         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                                            <rect x="6" y="6" width="12" height="12" rx="2"/>
+                                            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <path d="M8 12h8v8a8 8 0 0 1-8-8z"/>
                                         </svg>
                                     </div>
                                     <div class="network-info">
@@ -390,7 +397,9 @@
                             <div class="network-card compact" data-network="optimism">
                                 <div class="network-icon optimism">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <circle cx="12" cy="12" r="10"/>
+                                        <circle cx="8" cy="12" r="4" opacity="0.8"/>
+                                        <circle cx="16" cy="12" r="4" opacity="0.8"/>
+                                        <path d="M4 12a4 4 0 0 1 8 0 4 4 0 0 1 8 0" stroke="currentColor" stroke-width="2" fill="none"/>
                                     </svg>
                                 </div>
                                 <h5>Optimism</h5>
@@ -400,7 +409,7 @@
                             <div class="network-card compact" data-network="bsc">
                                 <div class="network-icon bsc">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2L4 8l8 6 8-6-8-6zm0 12l-8 6 8 6 8-6-8-6z"/>
+                                        <path d="M12 2L8 6h8l-4-4zm0 4L8 10h8l-4-4zm-4 4l-4 4 4 4V10zm8 0v8l4-4-4-4zm-4 4l-4 4h8l-4-4z"/>
                                     </svg>
                                 </div>
                                 <h5>BNB Chain</h5>
@@ -410,7 +419,8 @@
                             <div class="network-card compact" data-network="avalanche">
                                 <div class="network-icon avalanche">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2l10 17H2L12 2z"/>
+                                        <path d="M12 3L6 15h12L12 3z"/>
+                                        <path d="M8 17h8l-4 4-4-4z"/>
                                     </svg>
                                 </div>
                                 <h5>Avalanche</h5>
@@ -430,10 +440,10 @@
                                 <div class="network-header">
                                     <div class="network-icon polkadot">
                                         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                                            <circle cx="12" cy="4" r="2"/><circle cx="12" cy="20" r="2"/>
-                                            <circle cx="4" cy="12" r="2"/><circle cx="20" cy="12" r="2"/>
-                                            <circle cx="7" cy="7" r="1.5"/><circle cx="17" cy="7" r="1.5"/>
-                                            <circle cx="7" cy="17" r="1.5"/><circle cx="17" cy="17" r="1.5"/>
+                                            <ellipse cx="12" cy="6" rx="4" ry="2.5" transform="rotate(-30 12 6)"/>
+                                            <ellipse cx="12" cy="18" rx="4" ry="2.5" transform="rotate(30 12 18)"/>
+                                            <ellipse cx="6" cy="12" rx="4" ry="2.5" transform="rotate(30 6 12)"/>
+                                            <ellipse cx="18" cy="12" rx="4" ry="2.5" transform="rotate(-30 18 12)"/>
                                         </svg>
                                     </div>
                                     <div class="network-info">
@@ -441,8 +451,8 @@
                                         <span class="network-type relay">Relay Chain</span>
                                     </div>
                                     <div class="network-status">
-                                        <div class="status-dot active"></div>
-                                        <span>Ready</span>
+                                        <div class="status-dot beta"></div>
+                                        <span>Beta</span>
                                     </div>
                                 </div>
                                 <p class="network-description">The foundation of interoperable blockchain networks enabling true cross-chain communication and shared security.</p>
@@ -457,7 +467,9 @@
                                 <div class="network-header">
                                     <div class="network-icon moonbeam">
                                         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                                            <circle cx="12" cy="12" r="8"/>
+                                            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <circle cx="12" cy="12" r="6" opacity="0.6"/>
+                                            <circle cx="12" cy="12" r="3" opacity="0.8"/>
                                         </svg>
                                     </div>
                                     <div class="network-info">
@@ -465,8 +477,8 @@
                                         <span class="network-type parachain">Parachain</span>
                                     </div>
                                     <div class="network-status">
-                                        <div class="status-dot active"></div>
-                                        <span>Ready</span>
+                                        <div class="status-dot alpha"></div>
+                                        <span>Alpha</span>
                                     </div>
                                 </div>
                                 <p class="network-description">Ethereum-compatible smart contract parachain combining the best of both Ethereum and Polkadot ecosystems.</p>
@@ -586,12 +598,12 @@
             <div class="container">
                 <div class="cta-card scroll-reveal">
                     <div class="cta-content">
-                        <h2>Ready to Build the Future of Web3?</h2>
-                        <p>Join developers building production dApps with Apex SDK. Get started in under 10 minutes.</p>
+                        <h2>Ready to Explore Web3 Development?</h2>
+                        <p>Join developers experimenting with cross-chain dApps using Apex SDK. Start exploring our alpha framework and help shape the future.</p>
                     </div>
                     <div class="cta-actions">
                         <a href="viewer.html?doc=QUICK_START.md" class="btn btn-primary btn-large">
-                            Start Building Now
+                            Try the Alpha
                         </a>
                         <a href="https://github.com/carbobit/apex-sdk/tree/main/examples" class="btn btn-secondary btn-large">
                             View Examples
@@ -609,7 +621,7 @@
                 <!-- Brand Column -->
                 <div class="footer-brand">
                     <div class="footer-logo">
-                        <img src="assets/apex_logo.png" alt="Apex SDK" width="40" height="40">
+                        <img src="assets/apex_logo.png" alt="Apex SDK" width="40" height="40" loading="lazy">
                         <span>Apex SDK</span>
                     </div>
                     <p class="footer-tagline">The unified Rust framework for cross-chain blockchain development.</p>
@@ -670,6 +682,11 @@
     </footer>
 
     <!-- JavaScript -->
-    <script src="js/main.js" defer></script>
+    <!-- Utility scripts -->
+    <script src="js/utils/error-handler.js" defer></script>
+    <script src="js/utils/performance.js" defer></script>
+    
+    <!-- Main application script -->
+    <script src="js/main-browser.js" defer></script>
 </body>
 </html>
