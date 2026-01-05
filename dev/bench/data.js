@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1767643837548,
+  "lastUpdate": 1767653043608,
   "repoUrl": "https://github.com/carbobit/apex-sdk",
   "entries": {
     "Benchmark": [
@@ -3479,6 +3479,216 @@ window.BENCHMARK_DATA = {
             "name": "bulk_transaction_creation/evm_bulk/10",
             "value": 541,
             "range": "± 27",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/dot_to_planck",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/ksm_to_planck",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/eth_to_wei",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/planck_to_dot",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/wei_to_eth",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "chain_metadata_operations/get_rpc_endpoints",
+            "value": 3,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "chain_metadata_operations/check_smart_contract_support",
+            "value": 1,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "chain_metadata_operations/get_chain_ids",
+            "value": 1,
+            "range": "± 0",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "kherld.hussein@gmail.com",
+            "name": "kh3rld",
+            "username": "kh3rld"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "01f0e78830afcce7d1f0a25ff79fd4e1610182d0",
+          "message": "docs: fix logo (#79)\n\n* chore(docs): update logos and add new ones\n\n* docs(README): update links\n\n* docs(viewer): improve UI/UX\n\n* docs(viewer): improve UI/UX\n\n* docs(js): update module initialization and add new modules for advanced visualization, metrics, workflow simulator, and personalization\n\n* docs(css): update main stylesheet with new design elements and animations\n\n* docs(search): update search manifest with new categories and paths\n\n* docs(subscribe): update API endpoint and add new subscription handling logic\n\n* Revert \"docs(subscribe): update API endpoint and add new subscription handling logic\"\n\nThis reverts commit 8c1b76092fd71d852af33e6e530af594f7d5cb8c.\n\n* Revert \"docs(search): update search manifest with new categories and paths\"\n\nThis reverts commit 581eaa118c7c0a5c8524b3c9cbb7db47a42b5e0b.\n\n* Revert \"docs(css): update main stylesheet with new design elements and animations\"\n\nThis reverts commit fbe3410ef26484073511a56fa3c2ded72b1dc4c6.\n\n* Revert \"docs(js): update module initialization and add new modules for advanced visualization, metrics, workflow simulator, and personalization\"\n\nThis reverts commit 235e7bbe0f4c95db1d13c32d38856bab005d7311.\n\n* Revert \"docs(viewer): improve UI/UX\"\n\nThis reverts commit 070e644d74c5c28abee8f49147afd051f87caa7a.\n\n* Revert \"docs(viewer): improve UI/UX\"\n\nThis reverts commit f12ba946d40df93c8f846529b867b243405d6a57.\n\n* Revert \"docs(README): update links\"\n\nThis reverts commit b7dcfc536af992ae90dde40f946664ac30ae951d.\n\n* fix(test): update private key configuration\n\n* Add CSS variables for consistent design system\n\n- Define color palette with primary, secondary, and neutral colors\n- Set typography scale and spacing units\n- Add responsive breakpoints and z-index layers\n- Establish foundation for modular CSS architecture\n\n* Add base CSS styles with modern reset and typography\n\n- Implement modern CSS reset for consistent cross-browser rendering\n- Set base typography with Inter font family and responsive scaling\n- Add smooth scroll behavior and focus management\n- Establish foundational styling for semantic elements\n\n* Add responsive layout system with CSS Grid and Flexbox\n\n- Implement flexible grid system for consistent page layouts\n- Add responsive container and spacing utilities\n- Create mobile-first responsive design patterns\n- Ensure accessibility with proper heading hierarchy\n\n* Add modular component styles for UI consistency\n\n- Navigation component with responsive mobile menu\n- Button system with hover states and accessibility\n- Card layouts for feature and network displays\n- Footer with grid layout and social link animations\n- Network explorer with proper brand styling\n- Form elements with modern interaction states\n\n* Add utility classes for rapid development\n\n- Spacing utilities with consistent margin/padding scale\n- Typography helpers for text alignment and sizing\n- Display utilities for responsive visibility control\n- Accessibility utilities for screen readers and focus management\n\n* Add modular CSS entry point for organized architecture\n\n- Single import file that loads all CSS modules in correct order\n- Eliminates need for multiple link tags in HTML\n- Provides clear dependency management for styles\n- Enables easier maintenance and updates\n\n* Add page-specific CSS overrides\n\n- Documentation viewer page enhancements\n- Special layout adjustments for content pages\n- Maintains compatibility with new modular system\n- Handles edge cases for complex page layouts\n\n* Add unified JavaScript application with modular architecture\n\n- Browser-compatible ApexSDK namespace for all components\n- Theme toggle with localStorage persistence\n- Mobile menu with smooth animations\n- Chain renderer for network status display\n- Error handling and performance monitoring\n- Documentation viewer integration\n\n* Add JavaScript utility modules for error handling and performance\n\n- Centralized error handling with user-friendly messages\n- Performance monitoring with Core Web Vitals tracking\n- Loading state management for better UX\n- Consistent error reporting across all components\n\n* Add Service Worker for enhanced performance and offline support\n\n- Cache static assets for faster loading\n- Network-first strategy for dynamic content\n- Offline fallback page for better UX\n- Background sync for improved reliability\n\n* Add offline fallback page for Service Worker\n\n- User-friendly offline experience\n- Consistent branding when network unavailable\n- Helpful messaging with retry functionality\n- Maintains visual consistency with main site\n\n* Update homepage to use modular architecture and fix messaging\n\n- Switch to modular CSS system for better maintainability\n- Remove 'production ready' claims for alpha release\n- Update CTA section with realistic development status messaging\n- Improve semantic HTML structure and accessibility\n- Add Service Worker integration for performance\n\n* Update documentation viewer with modular architecture\n\n- Migrate to modular CSS and JavaScript system\n- Enhance accessibility with proper ARIA attributes\n- Improve responsive design for mobile devices\n- Add Service Worker integration for offline docs viewing\n\n* Add reusable HTML includes for component management\n\n- Modular HTML components for navigation and footer\n- Consistent UI elements across all pages\n- Easier maintenance with centralized component files\n- Template system for dynamic content injection\n\n* Add JavaScript component modules for specific functionality\n\n- Individual modules for theme, menu, and documentation features\n- Clean separation of concerns for easier testing\n- Modular architecture supporting code reuse\n- Enhanced maintainability with focused components\n\n* Add feature-specific JavaScript modules\n\n- Chain renderer for blockchain network display\n- Documentation viewer for interactive content\n- Modular structure supporting feature isolation\n- Enhanced code organization and testability\n\n* Add ES6 modular JavaScript entry point\n\n- Modern import/export syntax for module system\n- Alternative architecture supporting Node.js environments\n- Clean dependency management with explicit imports\n- Future-ready codebase for advanced tooling integration\n\n* fix(docs): ui\n\n---------\n\nCo-authored-by: Kherld <50875687+kherldhussein@users.noreply.github.com>",
+          "timestamp": "2026-01-05T17:34:02-05:00",
+          "tree_id": "9acdbdad9d266310ac1609f21e2a33f5f8089f8e",
+          "url": "https://github.com/carbobit/apex-sdk/commit/01f0e78830afcce7d1f0a25ff79fd4e1610182d0"
+        },
+        "date": 1767653043003,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "transaction_creation/create_substrate_transfer",
+            "value": 67,
+            "range": "± 10",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "transaction_creation/create_evm_transfer",
+            "value": 67,
+            "range": "± 9",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/substrate_validation/0",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/substrate_validation/1",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/substrate_validation/2",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/evm_validation/0",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/evm_validation/1",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/evm_validation/2",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "sdk_initialization/create_substrate_sdk",
+            "value": 29,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "sdk_initialization/create_evm_sdk",
+            "value": 29,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "sdk_initialization/create_multi_chain_sdk",
+            "value": 58,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "transaction_signing/substrate_sign_simulation",
+            "value": 160772,
+            "range": "± 470",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "transaction_signing/evm_sign_simulation",
+            "value": 140591,
+            "range": "± 385",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "amount_operations/amount_creation",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "amount_operations/amount_arithmetic",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "cross_chain_operations/chain_type_detection",
+            "value": 2,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "cross_chain_operations/multi_chain_transaction_creation",
+            "value": 134,
+            "range": "± 25",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "cross_chain_operations/cross_chain_address_handling",
+            "value": 20,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "hybrid_chain_operations/hybrid_chain_type_check",
+            "value": 1,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "hybrid_chain_operations/hybrid_evm_transaction",
+            "value": 66,
+            "range": "± 10",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "bulk_transaction_creation/substrate_bulk/10",
+            "value": 740,
+            "range": "± 162",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "bulk_transaction_creation/substrate_bulk/100",
+            "value": 7054,
+            "range": "± 1615",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "bulk_transaction_creation/evm_bulk/10",
+            "value": 706,
+            "range": "± 160",
             "unit": "ns/iter"
           },
           {
