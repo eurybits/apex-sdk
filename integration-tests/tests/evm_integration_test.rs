@@ -5,13 +5,18 @@
 #[path = "integration_helpers.rs"]
 mod integration_helpers;
 
-use apex_sdk_evm::{wallet::Wallet, EvmAdapter};
+use apex_sdk_core::Signer;
+use apex_sdk_evm::{wallet::Wallet, EvmAdapter, EvmSigner};
 use integration_helpers::*;
 
 #[tokio::test]
-#[ignore]
+#[ignore] // Integration test - requires Docker EVM node
 async fn test_evm_connection_to_docker_node() {
-    skip_if_not_integration!();
+    // Always skip this test unless explicitly enabled with INTEGRATION_TESTS=1
+    if !is_integration_enabled() {
+        println!("Skipping Docker integration test - set INTEGRATION_TESTS=1 to run");
+        return;
+    }
 
     wait_for_evm_node(30)
         .await
@@ -31,9 +36,13 @@ async fn test_evm_connection_to_docker_node() {
 }
 
 #[tokio::test]
-#[ignore]
+#[ignore] // Integration test - requires Docker EVM node
 async fn test_evm_get_balance_from_docker_node() {
-    skip_if_not_integration!();
+    // Always skip this test unless explicitly enabled with INTEGRATION_TESTS=1
+    if !is_integration_enabled() {
+        println!("Skipping Docker integration test - set INTEGRATION_TESTS=1 to run");
+        return;
+    }
 
     wait_for_evm_node(30)
         .await
@@ -55,7 +64,7 @@ async fn test_evm_get_balance_from_docker_node() {
 }
 
 #[tokio::test]
-#[ignore]
+#[ignore] // Integration test - requires Docker EVM node
 async fn test_evm_send_transaction_to_docker_node() {
     skip_if_not_integration!();
 
@@ -67,16 +76,20 @@ async fn test_evm_send_transaction_to_docker_node() {
         .await
         .expect("Should connect to EVM node");
 
-    let wallet = Wallet::from_private_key(
-        "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
-    )
-    .expect("Should create wallet")
-    .with_chain_id(31337); // Hardhat default chain ID
+    let signer =
+        EvmSigner::new("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80")
+            .expect("Should create signer");
 
-    let from_address = wallet.address();
+    // Configure the adapter with the signer and immediate confirmation for faster tests
+    let adapter = adapter
+        .with_signer(signer.clone())
+        .with_confirmation_strategy(apex_sdk_core::ConfirmationStrategy::Immediate);
+
+    let from_address = signer.address();
+    let from_address_str = from_address.to_string();
     let to_address_str = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
 
-    let initial_from = adapter.get_balance(&from_address).await.unwrap();
+    let initial_from = adapter.get_balance(&from_address_str).await.unwrap();
     let initial_to = adapter.get_balance(to_address_str).await.unwrap();
 
     println!("Initial balances:");
@@ -100,7 +113,7 @@ async fn test_evm_send_transaction_to_docker_node() {
     // Verify balances changed
     tokio::time::sleep(tokio::time::Duration::from_millis(500)).await; // Wait for block
 
-    let final_from = adapter.get_balance(&from_address).await.unwrap();
+    let final_from = adapter.get_balance(&from_address_str).await.unwrap();
     let final_to = adapter.get_balance(to_address_str).await.unwrap();
 
     println!("\nFinal balances:");

@@ -14,7 +14,7 @@ use apex_sdk_core::{
     BlockInfo, Broadcaster, ConfirmationStrategy, NonceManager, Provider as CoreProvider,
     ReceiptWatcher, SdkError,
 };
-use apex_sdk_types::{Address, TransactionStatus as OldTransactionStatus};
+use apex_sdk_types::{Address, TransactionStatus, TxStatus};
 use async_trait::async_trait;
 use subxt::{OnlineClient, PolkadotConfig};
 use thiserror::Error;
@@ -24,6 +24,7 @@ pub mod block;
 pub mod cache;
 pub mod contracts;
 pub mod metrics;
+pub mod nonce_manager;
 pub mod pool;
 pub mod signer;
 pub mod storage;
@@ -41,9 +42,10 @@ pub use contracts::{
     StorageDepositLimit,
 };
 pub use metrics::{Metrics, MetricsSnapshot};
+pub use nonce_manager::SubstrateNonceManager;
 pub use pool::{ConnectionPool, PoolConfig};
 pub use signer::{ApexSigner, Ed25519Signer, Sr25519Signer};
-pub use storage::{StorageClient, StorageQuery};
+pub use storage::{AccountInfo, StorageClient, StorageQuery};
 pub use transaction::{BatchCall, BatchMode, FeeConfig, RetryConfig, TransactionExecutor};
 pub use wallet::{KeyPairType, Wallet, WalletManager};
 pub use xcm::{
@@ -280,7 +282,7 @@ impl SubstrateAdapter {
     }
 
     /// Get transaction status by extrinsic hash
-    pub async fn get_transaction_status(&self, tx_hash: &str) -> Result<OldTransactionStatus> {
+    pub async fn get_transaction_status(&self, tx_hash: &str) -> Result<TransactionStatus> {
         if !self.connected {
             return Err(Error::Connection("Not connected".to_string()));
         }
@@ -392,7 +394,7 @@ impl SubstrateAdapter {
                     return if success {
                         // For substrate, we consider a transaction confirmed once it's included in a block
                         // The confirmation threshold is mainly for documentation purposes
-                        Ok(OldTransactionStatus::confirmed(
+                        Ok(TransactionStatus::confirmed(
                             tx_hash.to_string(),
                             block_num as u64,
                             block_hash.to_string(),
@@ -401,17 +403,17 @@ impl SubstrateAdapter {
                             Some(confirmations),
                         ))
                     } else if let Some(error) = error_msg {
-                        Ok(OldTransactionStatus::failed(tx_hash.to_string(), error))
+                        Ok(TransactionStatus::failed(tx_hash.to_string(), error))
                     } else {
                         // Transaction found but status unclear
-                        Ok(OldTransactionStatus::unknown(tx_hash.to_string()))
+                        Ok(TransactionStatus::unknown(tx_hash.to_string()))
                     };
                 }
             }
         }
 
         // Transaction not found in recent blocks
-        Ok(OldTransactionStatus::unknown(tx_hash.to_string()))
+        Ok(TransactionStatus::unknown(tx_hash.to_string()))
     }
 
     /// Validate a Substrate address (SS58 format)
@@ -535,7 +537,7 @@ impl apex_sdk_core::ChainAdapter for SubstrateAdapter {
     async fn get_transaction_status(
         &self,
         tx_hash: &str,
-    ) -> std::result::Result<OldTransactionStatus, String> {
+    ) -> std::result::Result<TransactionStatus, String> {
         self.get_transaction_status(tx_hash)
             .await
             .map_err(|e| e.to_string())
@@ -574,43 +576,10 @@ impl CoreProvider for SubstrateAdapter {
     async fn get_transaction_count(&self, address: &Address) -> std::result::Result<u64, SdkError> {
         match address {
             Address::Substrate(addr) => {
-                // Parse SS58 address to get AccountId32
-                use sp_core::crypto::{AccountId32, Ss58Codec};
-                let account_id = AccountId32::from_ss58check(addr)
-                    .map_err(|e| SdkError::ConfigError(format!("Invalid SS58 address: {}", e)))?;
+                // Use StorageClient to properly query the nonce
+                let storage_client = StorageClient::new(self.client.clone(), self.metrics.clone());
 
-                // Query account info from System pallet using dynamic API
-                let account_bytes: &[u8] = account_id.as_ref();
-                let storage_query = subxt::dynamic::storage(
-                    "System",
-                    "Account",
-                    vec![subxt::dynamic::Value::from_bytes(account_bytes)],
-                );
-
-                let result = self
-                    .client
-                    .storage()
-                    .at_latest()
-                    .await
-                    .map_err(Error::from)?
-                    .fetch(&storage_query)
-                    .await
-                    .map_err(Error::from)?;
-
-                if let Some(account_data) = result {
-                    // Decode the storage value
-                    let _decoded = account_data.to_value().map_err(|e| {
-                        SdkError::ProviderError(format!("Failed to decode account data: {}", e))
-                    })?;
-
-                    // Extract the nonce - simplified approach since we can't access the decoded structure directly
-                    // In a real implementation, you would use the typed API for better performance
-                    let nonce = 0u64; // Placeholder - use typed metadata for proper decoding
-
-                    Ok(nonce)
-                } else {
-                    Ok(0)
-                }
+                storage_client.get_nonce(addr).await.map_err(SdkError::from)
             }
             _ => Err(SdkError::ConfigError(
                 "Invalid address type for Substrate adapter".to_string(),
@@ -680,7 +649,7 @@ impl ReceiptWatcher for SubstrateAdapter {
     async fn wait_for_receipt(
         &self,
         tx_hash: &str,
-    ) -> std::result::Result<OldTransactionStatus, SdkError> {
+    ) -> std::result::Result<TransactionStatus, SdkError> {
         // Simple polling implementation
         // In a real implementation, we might want to use the retry/backoff logic or subscriptions
         let start = std::time::Instant::now();
@@ -692,9 +661,7 @@ impl ReceiptWatcher for SubstrateAdapter {
                 .await
                 .map_err(|e| SdkError::NetworkError(e.to_string()))?;
             // Check if status represents finalized or confirmed
-            if status.status == apex_sdk_types::TxStatus::Confirmed
-                || status.status == apex_sdk_types::TxStatus::Finalized
-            {
+            if status.status == TxStatus::Confirmed || status.status == TxStatus::Finalized {
                 return Ok(status);
             }
             // For Substrate, we default to finalized head confirmation policy
@@ -710,7 +677,7 @@ impl ReceiptWatcher for SubstrateAdapter {
         &self,
         tx_hash: &str,
         _strategy: &ConfirmationStrategy,
-    ) -> std::result::Result<OldTransactionStatus, SdkError> {
+    ) -> std::result::Result<TransactionStatus, SdkError> {
         // For now, use the basic wait implementation regardless of strategy
         self.wait_for_receipt(tx_hash)
             .await
@@ -720,7 +687,7 @@ impl ReceiptWatcher for SubstrateAdapter {
     async fn get_receipt_status(
         &self,
         tx_hash: &str,
-    ) -> std::result::Result<Option<OldTransactionStatus>, SdkError> {
+    ) -> std::result::Result<Option<TransactionStatus>, SdkError> {
         match self.get_transaction_status(tx_hash).await {
             Ok(status) => Ok(Some(status)),
             Err(_) => Ok(None), // If error, assume transaction not found
