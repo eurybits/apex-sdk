@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1767991733770,
+  "lastUpdate": 1768279168657,
   "repoUrl": "https://github.com/carbobit/apex-sdk",
   "entries": {
     "Benchmark": [
@@ -5999,6 +5999,216 @@ window.BENCHMARK_DATA = {
             "name": "bulk_transaction_creation/evm_bulk/10",
             "value": 582,
             "range": "± 24",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/dot_to_planck",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/ksm_to_planck",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/eth_to_wei",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/planck_to_dot",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "decimal_conversions/wei_to_eth",
+            "value": 6,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "chain_metadata_operations/get_rpc_endpoints",
+            "value": 3,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "chain_metadata_operations/check_smart_contract_support",
+            "value": 1,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "chain_metadata_operations/get_chain_ids",
+            "value": 1,
+            "range": "± 0",
+            "unit": "ns/iter"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "kherld.hussein@gmail.com",
+            "name": "kh3rld",
+            "username": "kh3rld"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "20f615754ac4712cb9a987f735a8b07691216f96",
+          "message": "feat(v0.1.5): block querying & transaction pipeline (#97)\n\n* fix(docs): resolve networks display and update footer copyright\n\n- Fix networks not showing on page load by reordering renderChains() before initChainsFilter()\n- Update footer copyright to '© 2026 Apex SDK Protocol by Carbobit'\n- Ensures all network cards display immediately without user interaction\n\nFixes display issues on landing page for v0.1.5 release\n\n* feat(evm): implement RPC URL tracking to EvmProvider\n\n- Add rpc_url field to EvmProvider struct\n- Implement rpc_url() getter method\n- Store endpoint URL for later retrieval by adapter\n\nRequired for proper endpoint() method implementation\n\n* fix(tests): update golden vectors and metrics tests for v0.1.5\n\n- Replace ChainType::Evm with ChainType::Ethereum across all tests\n- Update SubstrateEra from enum variant to struct initialization\n- Fix metrics API calls: record_operation_time() → record_duration()\n- Fix metrics API calls: get_performance_metrics() → get_metrics()\n\nAll 119 tests now passing\n\n* refactor(substrate): update signer implementations and enhance transaction fee estimation\n\n- Updated the SR25519 and ED25519 signer implementations to simplify the code and remove unnecessary account ID storage.\n- Introduced a new method in the TransactionExecutor to estimate fees from raw transaction bytes, using a dummy transfer for estimation.\n- Implemented the FeeEstimator trait for TransactionExecutor with a placeholder for fee estimation from raw bytes.\n- Added async signing capabilities to the Wallet struct by implementing the CoreSigner trait.\n- Created comprehensive tests for the connection pool module, covering configuration, connection management, health checking, and load balancing.\n\n* feat: improve transaction status tracking\n\n* refactor(core): removed unused methods\n\n* feat(substrate): enhance various nonce management\n\n* feat(cli): implement and fix EIP-1559 deployment flow\n\n* test(types): enhance testing and types implementation\n\n* refactor(sdk): enhance transaction and performance optimization\n\n* text(integration): update tests\n\n* docs: refactor and update the UI and documentation for v0.1.5\n\n* docs: update README\n\n* chore(CHANGELOG): restore CHANGELOG\n\n* release: v0.1.5\n\n* fix(ci): update workflows referenced apex-sdk-cli package and apex binary\n\n* fix(cli): remove unused dependencies\n\n* fix(evm): removed redundant (gas_price as u128) cast\n\n* fix(deps): remove unused dependencies\n\n* fix(substrate): removed redundant cast\n\n* fix(cli): removed redundant cast for gas price in estimated cost calculation\n\n* chore: update CHANGELOG for v0.1.5 release\n\n* feat: enhance BlockInfo with comprehensive metadata\n\n* fix: update mock provider with enhanced BlockInfo fields\n\n* feat: add BlockInfo metadata to EVM provider\n\n* feat: implement BlockQuery module for comprehensive block retrieval\n\n* feat: add finality-aware block caching with dual-key storage\n\n* feat: replace mock block data with real subxt v0.44 implementation\n\n* test: add comprehensive block performance benchmarks\n\n* test: add 13 unit tests for block caching and serialization\n\n---------\n\nCo-authored-by: Kherld <50875687+kherldhussein@users.noreply.github.com>",
+          "timestamp": "2026-01-12T23:29:30-05:00",
+          "tree_id": "dd83a0a7f54e0a9c8afd918e3602d5f041349a1e",
+          "url": "https://github.com/carbobit/apex-sdk/commit/20f615754ac4712cb9a987f735a8b07691216f96"
+        },
+        "date": 1768279168402,
+        "tool": "cargo",
+        "benches": [
+          {
+            "name": "transaction_creation/create_substrate_transfer",
+            "value": 57,
+            "range": "± 2",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "transaction_creation/create_evm_transfer",
+            "value": 54,
+            "range": "± 2",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/substrate_validation/0",
+            "value": 11,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/substrate_validation/1",
+            "value": 11,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/substrate_validation/2",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/evm_validation/0",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/evm_validation/1",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "address_validation/evm_validation/2",
+            "value": 12,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "sdk_initialization/create_substrate_sdk",
+            "value": 29,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "sdk_initialization/create_evm_sdk",
+            "value": 29,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "sdk_initialization/create_multi_chain_sdk",
+            "value": 54,
+            "range": "± 1",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "transaction_signing/substrate_sign_simulation",
+            "value": 160919,
+            "range": "± 794",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "transaction_signing/evm_sign_simulation",
+            "value": 140636,
+            "range": "± 498",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "amount_operations/amount_creation",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "amount_operations/amount_arithmetic",
+            "value": 0,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "cross_chain_operations/chain_type_detection",
+            "value": 2,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "cross_chain_operations/multi_chain_transaction_creation",
+            "value": 107,
+            "range": "± 5",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "cross_chain_operations/cross_chain_address_handling",
+            "value": 20,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "hybrid_chain_operations/hybrid_chain_type_check",
+            "value": 1,
+            "range": "± 0",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "hybrid_chain_operations/hybrid_evm_transaction",
+            "value": 59,
+            "range": "± 3",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "bulk_transaction_creation/substrate_bulk/10",
+            "value": 587,
+            "range": "± 27",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "bulk_transaction_creation/substrate_bulk/100",
+            "value": 5464,
+            "range": "± 262",
+            "unit": "ns/iter"
+          },
+          {
+            "name": "bulk_transaction_creation/evm_bulk/10",
+            "value": 546,
+            "range": "± 25",
             "unit": "ns/iter"
           },
           {
