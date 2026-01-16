@@ -134,4 +134,4 @@ Submit your research to: **research@apexsdk.dev**
 **Research Team:** Apex SDK Research Team  
 **Email:** research@apexsdk.dev  
 **Discord:** https://discord.gg/zCDFsBaZJN  
-**Repository:** [apex-sdk](https://github.com/carbobit/apex-sdk)
+**Repository:** [apex-sdk](https://github.com/apex-sdk/apex-sdk)

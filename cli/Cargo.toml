@@ -4,8 +4,8 @@ version = "0.1.5"
 edition = "2021"
 description = "CLI tool for Apex SDK"
 license = "Apache-2.0"
-repository = "https://github.com/carbobit/apex-sdk"
-homepage = "https://github.com/carbobit/apex-sdk"
+repository = "https://github.com/apex-sdk/apex-sdk"
+homepage = "https://github.com/apex-sdk/apex-sdk"
 documentation = "https://docs.rs/apex-sdk-cli"
 
 [[bin]]

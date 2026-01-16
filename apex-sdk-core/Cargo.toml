@@ -4,7 +4,7 @@ version = "0.1.5"
 edition = "2021"
 description = "Core traits and types for Apex SDK"
 license = "Apache-2.0"
-repository = "https://github.com/carbobit/apex-sdk"
+repository = "https://github.com/apex-sdk/apex-sdk"
 
 [dependencies]
 apex-sdk-types = { path = "../apex-sdk-types", version = "0.1.5" }

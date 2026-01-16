@@ -82,12 +82,12 @@ Best for:
 ### GitHub
 For code-related issues, feature requests, and contributions:
 
-**[Apex SDK on GitHub](https://github.com/carbobit/apex-sdk)**
+**[Apex SDK on GitHub](https://github.com/apex-sdk/apex-sdk)**
 
-- 🐛 [Report a Bug](https://github.com/carbobit/apex-sdk/issues/new?template=bug_report.md)
-- 💡 [Request a Feature](https://github.com/carbobit/apex-sdk/issues/new?template=feature_request.md)
-- 🔀 [Submit a Pull Request](https://github.com/carbobit/apex-sdk/pulls)
-- 📖 [View Documentation](https://github.com/carbobit/apex-sdk/tree/main/docs)
+- 🐛 [Report a Bug](https://github.com/apex-sdk/apex-sdk/issues/new?template=bug_report.md)
+- 💡 [Request a Feature](https://github.com/apex-sdk/apex-sdk/issues/new?template=feature_request.md)
+- 🔀 [Submit a Pull Request](https://github.com/apex-sdk/apex-sdk/pulls)
+- 📖 [View Documentation](https://github.com/apex-sdk/apex-sdk/tree/main/docs)
 
 ### X (Twitter)
 Follow us for updates, announcements, and community highlights:
@@ -128,7 +128,7 @@ To help us help you faster, please:
 
 ✅ Check the [Documentation](https://apexsdk.dev/viewer.html)
 ✅ Review the [Quick Start Guide](QUICK_START.md)
-✅ Search [GitHub Issues](https://github.com/carbobit/apex-sdk/issues)
+✅ Search [GitHub Issues](https://github.com/apex-sdk/apex-sdk/issues)
 ✅ Browse [FAQ](https://apexsdk.dev/#faq) (if available)
 ✅ Prepare relevant code snippets, error messages, or logs
 

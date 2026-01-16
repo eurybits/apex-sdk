@@ -78,5 +78,5 @@ Apex SDK implements several security measures:
 ## Contact
 
 - **Security Email**: security@apexsdk.dev
-- **Security Advisories**: https://github.com/carbobit/apex-sdk/security/advisories
+- **Security Advisories**: https://github.com/apex-sdk/apex-sdk/security/advisories
 

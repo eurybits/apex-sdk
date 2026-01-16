@@ -202,7 +202,7 @@ Apex SDK Team, "Apex SDK: A Unified Rust Framework for Cross-Chain Blockchain De
 **Research Team:** Apex SDK Research Team
 **Email:** research@apexsdk.dev
 **Discord:** https://discord.gg/zCDFsBaZJN
-**GitHub:** https://github.com/carbobit/apex-sdk
+**GitHub:** https://github.com/apex-sdk/apex-sdk
 
 ## License
 

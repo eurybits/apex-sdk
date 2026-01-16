@@ -3,7 +3,7 @@
 [![Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://apexsdk.dev/)
 [![Discord](https://img.shields.io/discord/1234567890?label=discord)](https://discord.gg/zCDFsBaZJN)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](../LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/carbobit/apex-sdk?style=social)](https://github.com/carbobit/apex-sdk)
+[![GitHub Stars](https://img.shields.io/github/stars/apex-sdk/apex-sdk?style=social)](https://github.com/apex-sdk/apex-sdk)
 
 Welcome to Apex SDK! Build cross-chain applications with confidence using Rust's type safety and performance.
 
@@ -122,10 +122,10 @@ Each example includes:
 
 ## Community
 
-- **GitHub**: [carbobit/apex-sdk](https://github.com/carbobit/apex-sdk)
-- **Issues**: [Report bugs](https://github.com/carbobit/apex-sdk/issues)
-- **Discussions**: [Join the conversation](https://github.com/carbobit/apex-sdk/discussions)
+- **GitHub**: [apex-sdk/apex-sdk](https://github.com/apex-sdk/apex-sdk)
+- **Issues**: [Report bugs](https://github.com/apex-sdk/apex-sdk/issues)
+- **Discussions**: [Join the conversation](https://github.com/apex-sdk/apex-sdk/discussions)
 
 ## License
 
-[Apache 2.0](https://github.com/carbobit/apex-sdk/blob/main/LICENSE)
+[Apache 2.0](https://github.com/apex-sdk/apex-sdk/blob/main/LICENSE)
