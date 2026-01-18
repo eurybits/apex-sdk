@@ -1,0 +1,81 @@
+# Configuration for automated release notes
+# https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+      - duplicate
+      - invalid
+      - wontfix
+    authors:
+      - dependabot
+      - github-actions
+
+  categories:
+    - title: New Features
+      labels:
+        - feature
+        - enhancement
+        - new
+
+    - title: Bug Fixes
+      labels:
+        - bug
+        - fix
+        - bugfix
+
+    - title: Documentation
+      labels:
+        - documentation
+        - docs
+
+    - title: Performance Improvements
+      labels:
+        - performance
+        - optimization
+        - perf
+
+    - title: Security
+      labels:
+        - security
+        - vulnerability
+
+    - title: CI/CD & Infrastructure
+      labels:
+        - ci
+        - github-actions
+        - infrastructure
+
+    - title: Code Quality & Refactoring
+      labels:
+        - refactor
+        - cleanup
+        - code-quality
+
+    - title: Dependencies
+      labels:
+        - dependencies
+        - deps
+        - rust
+
+    - title: Testing
+      labels:
+        - tests
+        - testing
+
+    - title: Substrate
+      labels:
+        - substrate
+
+    - title: EVM
+      labels:
+        - evm
+
+    - title: CLI
+      labels:
+        - cli
+
+    - title: Other Changes
+      labels:
+        - "*"
