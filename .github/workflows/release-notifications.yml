@@ -1,0 +1,187 @@
+name: Release Notifications
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify-discord:
+    name: Notify Discord
+    runs-on: ubuntu-latest
+    if: ${{ secrets.DISCORD_WEBHOOK_URL != '' }}
+    steps:
+      - name: Send Discord Notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const release = context.payload.release;
+            const tagName = release.tag_name;
+            const releaseName = release.name;
+            const releaseUrl = release.html_url;
+            const author = release.author.login;
+            const isPrerelease = release.prerelease;
+
+            // Format release notes for Discord (truncate if too long)
+            let body = release.body || 'No release notes provided.';
+            if (body.length > 1500) {
+              body = body.substring(0, 1500) + '...\n\n[Read more](' + releaseUrl + ')';
+            }
+
+            // Create Discord embed
+            const embed = {
+              title: `${releaseName}`,
+              description: body,
+              url: releaseUrl,
+              color: isPrerelease ? 0xFFA500 : 0x00FF00, // Orange for prerelease, Green for stable
+              fields: [
+                {
+                  name: 'Version',
+                  value: tagName,
+                  inline: true
+                },
+                {
+                  name: 'Type',
+                  value: isPrerelease ? 'Pre-release' : 'Stable',
+                  inline: true
+                },
+                {
+                  name: 'Published by',
+                  value: author,
+                  inline: true
+                }
+              ],
+              footer: {
+                text: 'Apex SDK Release',
+                icon_url: 'https://github.com/apex-sdk.png'
+              },
+              timestamp: new Date().toISOString()
+            };
+
+            // Send to Discord webhook
+            const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+            await fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: 'Apex SDK Bot',
+                avatar_url: 'https://github.com/apex-sdk.png',
+                embeds: [embed]
+              })
+            });
+
+            console.log('Discord notification sent successfully');
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  notify-slack:
+    name: Notify Slack
+    runs-on: ubuntu-latest
+    if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+    steps:
+      - name: Send Slack Notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const release = context.payload.release;
+            const tagName = release.tag_name;
+            const releaseName = release.name;
+            const releaseUrl = release.html_url;
+            const author = release.author.login;
+            const isPrerelease = release.prerelease;
+
+            // Format release notes for Slack
+            let body = release.body || 'No release notes provided.';
+            if (body.length > 2000) {
+              body = body.substring(0, 2000) + '...\n\n<' + releaseUrl + '|Read more>';
+            }
+
+            // Create Slack message
+            const message = {
+              text: `New Apex SDK Release: ${releaseName}`,
+              blocks: [
+                {
+                  type: 'header',
+                  text: {
+                    type: 'plain_text',
+                    text: `${releaseName}`,
+                    emoji: true
+                  }
+                },
+                {
+                  type: 'section',
+                  fields: [
+                    {
+                      type: 'mrkdwn',
+                      text: `*Version:*\n${tagName}`
+                    },
+                    {
+                      type: 'mrkdwn',
+                      text: `*Type:*\n${isPrerelease ? 'Pre-release' : 'Stable'}`
+                    },
+                    {
+                      type: 'mrkdwn',
+                      text: `*Published by:*\n${author}`
+                    },
+                    {
+                      type: 'mrkdwn',
+                      text: `*Date:*\n${new Date().toLocaleDateString()}`
+                    }
+                  ]
+                },
+                {
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: body.replace(/^## /gm, '*').replace(/^### /gm, '*')
+                  }
+                },
+                {
+                  type: 'actions',
+                  elements: [
+                    {
+                      type: 'button',
+                      text: {
+                        type: 'plain_text',
+                        text: 'View Release',
+                        emoji: true
+                      },
+                      url: releaseUrl,
+                      style: 'primary'
+                    },
+                    {
+                      type: 'button',
+                      text: {
+                        type: 'plain_text',
+                        text: 'Documentation',
+                        emoji: true
+                      },
+                      url: 'https://apexsdk.dev'
+                    }
+                  ]
+                },
+                {
+                  type: 'divider'
+                },
+                {
+                  type: 'context',
+                  elements: [
+                    {
+                      type: 'mrkdwn',
+                      text: 'Install: `cargo install apex-cli@' + tagName.replace('v', '') + '`'
+                    }
+                  ]
+                }
+              ]
+            };
+
+            // Send to Slack webhook
+            const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+            await fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(message)
+            });
+
+            console.log('Slack notification sent successfully');
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

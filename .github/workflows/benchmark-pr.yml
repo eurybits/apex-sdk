@@ -1,0 +1,175 @@
+name: Benchmark PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '**.rs'
+      - '**/Cargo.toml'
+      - 'benches/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v6
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache target directory
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run benchmarks on PR branch
+        run: |
+          cargo bench --workspace --no-fail-fast -- --output-format bencher | tee pr-bench.txt
+        continue-on-error: true
+
+      - name: Save PR benchmark results
+        run: |
+          cat pr-bench.txt || echo "No benchmark results"
+          cp pr-bench.txt /tmp/pr-bench.txt || true
+
+      - name: Checkout base branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.base_ref }}
+          clean: false
+
+      - name: Run benchmarks on base branch
+        run: |
+          cargo bench --workspace --no-fail-fast -- --output-format bencher | tee base-bench.txt
+        continue-on-error: true
+
+      - name: Compare benchmarks
+        id: compare
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+
+            let prBench = '';
+            let baseBench = '';
+
+            try {
+              prBench = fs.readFileSync('/tmp/pr-bench.txt', 'utf8');
+            } catch (e) {
+              console.log('No PR benchmark results found');
+            }
+
+            try {
+              baseBench = fs.readFileSync('base-bench.txt', 'utf8');
+            } catch (e) {
+              console.log('No base benchmark results found');
+            }
+
+            // Parse benchmark results
+            function parseBenchmarks(text) {
+              const lines = text.split('\n');
+              const results = {};
+              for (const line of lines) {
+                const match = line.match(/test (.+)\s+\.\.\. bench:\s+([\d,]+) ns\/iter \(\+\/- ([\d,]+)\)/);
+                if (match) {
+                  const [, name, time, variance] = match;
+                  results[name] = {
+                    time: parseInt(time.replace(/,/g, '')),
+                    variance: parseInt(variance.replace(/,/g, ''))
+                  };
+                }
+              }
+              return results;
+            }
+
+            const prResults = parseBenchmarks(prBench);
+            const baseResults = parseBenchmarks(baseBench);
+
+            // Generate comparison table
+            let comment = '## Benchmark Results\n\n';
+
+            if (Object.keys(prResults).length === 0) {
+              comment += '_No benchmark results available for this PR._\n\n';
+              comment += 'Run `cargo bench` locally to test performance.';
+            } else {
+              comment += '| Benchmark | Base (ns/iter) | PR (ns/iter) | Diff | Change |\n';
+              comment += '|-----------|----------------|--------------|------|--------|\n';
+
+              let hasComparison = false;
+              for (const [name, prData] of Object.entries(prResults)) {
+                const baseData = baseResults[name];
+                if (baseData) {
+                  hasComparison = true;
+                  const diff = prData.time - baseData.time;
+                  const percentChange = ((diff / baseData.time) * 100).toFixed(2);
+                  const emoji = diff > 0 ? '🔴' : diff < 0 ? '🟢' : '⚪';
+                  const changeText = diff > 0 ? `+${percentChange}%` : `${percentChange}%`;
+
+                  comment += `| ${name} | ${baseData.time.toLocaleString()} | ${prData.time.toLocaleString()} | ${diff > 0 ? '+' : ''}${diff.toLocaleString()} | ${emoji} ${changeText} |\n`;
+                } else {
+                  comment += `| ${name} | - | ${prData.time.toLocaleString()} | - | New |\n`;
+                }
+              }
+
+              if (!hasComparison) {
+                comment += '\n_No baseline benchmarks found for comparison._\n';
+              }
+
+              comment += '\n---\n\n';
+              comment += '**Legend:** 🟢 Faster | 🔴 Slower | ⚪ No change | New benchmark\n\n';
+              comment += '<details><summary>View Raw Results</summary>\n\n';
+              comment += '### PR Branch\n```\n' + prBench.trim() + '\n```\n\n';
+              if (baseBench) {
+                comment += '### Base Branch\n```\n' + baseBench.trim() + '\n```\n';
+              }
+              comment += '</details>';
+            }
+
+            // Find existing benchmark comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Benchmark Results')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
